@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+
 import { Users, Building, CreditCard, Settings } from "lucide-react"
 
 interface AdminStats {
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
                     <p>Carregando painel administrativo...</p>
                 </div>
             </div>
@@ -58,14 +58,6 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <header className="bg-white shadow-sm border-b">
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold text-gray-900">Painel Administrativo</h1>
-                        <Badge variant="secondary">Admin</Badge>
-                    </div>
-                </div>
-            </header>
 
             <div className="container mx-auto px-4 py-8">
                 {/* Stats Cards */}

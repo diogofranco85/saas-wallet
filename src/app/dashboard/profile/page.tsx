@@ -95,7 +95,7 @@ export default function ProfilePage() {
                             <div className="flex items-center space-x-4">
                                 <Avatar className="h-20 w-20">
                                     <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
-                                    <AvatarFallback className="bg-blue-600 text-white text-lg">
+                                    <AvatarFallback className="bg-teal-600 text-white text-lg">
                                         {getInitials(session?.user?.name || "U")}
                                     </AvatarFallback>
                                 </Avatar>

@@ -160,7 +160,7 @@ export default function ChargesPage() {
                     <p className="text-muted-foreground">Gerencie todas as suas cobranças PIX</p>
                 </div>
                 <Link href="/dashboard/charges/new">
-                    <Button>
+                    <Button className="bg-teal-700 hover:bg-teal-900">
                         <Plus className="mr-2 h-4 w-4" />
                         Nova Cobrança
                     </Button>
@@ -238,7 +238,7 @@ export default function ChargesPage() {
                         <div className="text-center py-8">
                             <p className="text-muted-foreground mb-4">Nenhuma cobrança encontrada</p>
                             <Link href="/dashboard/charges/new">
-                                <Button>Criar primeira cobrança</Button>
+                                <Button className="bg-teal-700 hover:bg-teal-900">Criar primeira cobrança</Button>
                             </Link>
                         </div>
                     ) : (

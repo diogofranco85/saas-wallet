@@ -131,7 +131,7 @@ export default function NewCharge() {
                                 </div>
 
                                 <div className="flex space-x-4">
-                                    <Button type="submit" disabled={loading} className="flex-1">
+                                    <Button type="submit" disabled={loading} className="flex-1 bg-teal-700 hover:bg-teal-900">
                                         {loading ? "Criando..." : "Criar Cobrança PIX"}
                                     </Button>
                                     <Link href="/dashboard">

@@ -115,7 +115,7 @@ export default function ChargesPage() {
                     <p className="text-muted-foreground">Gerencie todos os usuários que fazem parte do seu time</p>
                 </div>
                 <Link href="/dashboard/charges/new">
-                    <Button className="bg-purple-500 hover:bg-purple-700">
+                    <Button className="bg-teal-700 hover:bg-teal-900">
                         <Plus className="mr-2 h-4 w-4" />
                         Enviar convite
                     </Button>

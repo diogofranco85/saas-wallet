@@ -90,7 +90,7 @@ export default function Dashboard() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
                     <p>Carregando dashboard...</p>
                 </div>
             </div>
@@ -143,7 +143,7 @@ export default function Dashboard() {
                     <Link href="/dashboard/charges/new">
                         <Card className="hover:shadow-md transition-shadow cursor-pointer">
                             <CardContent className="flex items-center p-6">
-                                <Plus className="h-8 w-8 text-blue-600 mr-3" />
+                                <Plus className="h-8 w-8 text-teal-600 mr-3" />
                                 <div>
                                     <h3 className="font-semibold">Nova Cobrança</h3>
                                     <p className="text-sm text-gray-600">Criar cobrança PIX</p>
@@ -200,7 +200,7 @@ export default function Dashboard() {
                             <div className="text-center py-8">
                                 <p className="text-gray-500 mb-4">Nenhuma cobrança encontrada</p>
                                 <Link href="/dashboard/charges/new">
-                                    <Button>Criar primeira cobrança</Button>
+                                    <Button className="bg-teal-700 hover:bg-teal-900">Criar primeira cobrança</Button>
                                 </Link>
                             </div>
                         ) : (

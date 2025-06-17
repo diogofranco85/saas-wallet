@@ -41,7 +41,7 @@ export function UserNav() {
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
                         <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
-                        <AvatarFallback className="bg-blue-600 text-white">{getInitials(session.user.name || "U")}</AvatarFallback>
+                        <AvatarFallback className="bg-teal-600 text-white">{getInitials(session.user.name || "U")}</AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>

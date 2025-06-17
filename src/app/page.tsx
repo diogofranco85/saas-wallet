@@ -6,19 +6,19 @@ import Link from "next/link"
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 to-indigo-100">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-2xl font-bold text-teal-600">
             <Image src="/hype-pay.png" alt="Hype Pay" width={150} height={100} />
           </div>
           <div className="space-x-4">
             <Link href="/auth/signin">
-              <Button variant="ghost">Entrar</Button>
+              <Button variant="outline">Entrar</Button>
             </Link>
             <Link href="/auth/signin">
-              <Button>Começar Grátis</Button>
+              <Button className="bg-teal-700 hover:bg-teal-900">Começar Grátis</Button>
             </Link>
           </div>
         </nav>
@@ -28,7 +28,7 @@ export default function LandingPage() {
       <section className="container mx-auto px-4 py-20 text-center">
         <h1 className="text-5xl font-bold text-gray-900 mb-6">
           Carteira Virtual com PIX
-          <span className="text-blue-600"> Simplificado</span>
+          <span className="text-teal-600"> Simplificado</span>
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
           Gerencie pagamentos PIX da sua empresa de forma simples e segura. Crie cobranças, acompanhe recebimentos e
@@ -47,7 +47,7 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <Card>
             <CardHeader>
-              <Zap className="h-10 w-10 text-blue-600 mb-2" />
+              <Zap className="h-10 w-10 text-teal-600 mb-2" />
               <CardTitle>PIX Instantâneo</CardTitle>
             </CardHeader>
             <CardContent>
@@ -57,7 +57,7 @@ export default function LandingPage() {
 
           <Card>
             <CardHeader>
-              <Shield className="h-10 w-10 text-blue-600 mb-2" />
+              <Shield className="h-10 w-10 text-teal-600 mb-2" />
               <CardTitle>Segurança Total</CardTitle>
             </CardHeader>
             <CardContent>
@@ -67,7 +67,7 @@ export default function LandingPage() {
 
           <Card>
             <CardHeader>
-              <Users className="h-10 w-10 text-blue-600 mb-2" />
+              <Users className="h-10 w-10 text-teal-600 mb-2" />
               <CardTitle>Equipe Colaborativa</CardTitle>
             </CardHeader>
             <CardContent>
@@ -77,7 +77,7 @@ export default function LandingPage() {
 
           <Card>
             <CardHeader>
-              <BarChart3 className="h-10 w-10 text-blue-600 mb-2" />
+              <BarChart3 className="h-10 w-10 text-teal-600 mb-2" />
               <CardTitle>Relatórios Completos</CardTitle>
             </CardHeader>
             <CardContent>
@@ -109,7 +109,7 @@ export default function LandingPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-blue-500 border-2">
+          <Card className="border-teal-500 border-2">
             <CardHeader>
               <CardTitle>Professional</CardTitle>
               <CardDescription>Mais popular</CardDescription>
