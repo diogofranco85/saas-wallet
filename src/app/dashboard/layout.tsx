@@ -8,6 +8,7 @@ import { UserNav } from "@/components/user-nav"
 import { Button } from "@/components/ui/button"
 import { Bell, Menu } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function DashboardLayout({
     children,
@@ -56,7 +57,9 @@ export default function DashboardLayout({
                         {/* Logo and Navigation */}
                         <div className="flex items-center space-x-8">
                             <Link href="/dashboard" className="flex items-center space-x-2">
-                                <div className="text-2xl font-bold text-blue-600">HypePay</div>
+                                <div className="text-2xl font-bold text-blue-600">
+                                    <Image src="/hype-pay.png" alt="Hype Pay" width={150} height={100} />
+                                </div>
                             </Link>
 
                             <nav className="hidden md:flex items-center space-x-6">

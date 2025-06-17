@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowRight, Shield, Zap, Users, BarChart3 } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 export default function LandingPage() {
@@ -9,7 +10,9 @@ export default function LandingPage() {
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-blue-600">HypePay</div>
+          <div className="text-2xl font-bold text-blue-600">
+            <Image src="/hype-pay.png" alt="Hype Pay" width={150} height={100} />
+          </div>
           <div className="space-x-4">
             <Link href="/auth/signin">
               <Button variant="ghost">Entrar</Button>
