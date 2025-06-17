@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { createServerClient } from "@/lib/supabase"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         }
 
         const supabase = createServerClient()
-        const { id: chargeId } = await params;
+        const chargeId = request.nextUrl.searchParams.get("id");
 
         // Buscar usuário e empresa
         const { data: user } = await supabase.from("users").select("company_id").eq("email", session.user.email).single()
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 }
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
@@ -50,7 +50,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
         }
 
         const supabase = createServerClient()
-        const chargeId = params.id
+        const chargeId = request.nextUrl.searchParams.get("id")
         const { status } = await request.json()
 
         // Buscar usuário e empresa
