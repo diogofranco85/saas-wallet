@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
         let query = supabase.from("pix_charges").select("*", { count: "exact" }).eq("company_id", user.company_id)
 
 
-        if (user.role !== "owner" || user.role !== 'admin') {
+        if (user.role !== "owner" && user.role !== 'admin') {
             query = query.eq("created_by", user.id)
         }
         // Aplicar filtros
