@@ -38,12 +38,10 @@ export default function Onboarding() {
     useEffect(() => {
         if (status === "loading") return // Still loading
 
-        if
-
         if (!session) {
-                router.push("/auth/signin")
-                return
-            }
+            router.push("/auth/signin")
+            return
+        }
 
         handlerGetPlans()
     }, [session, status])
