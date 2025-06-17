@@ -12,14 +12,14 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 
 export default function Onboarding() {
-    const { data: session } = useSession()
+    const { data: session, status } = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [plans, setPlans] = useState([
         {
-            id: "",
-            name: "",
-            price: ""
+            id: "0",
+            name: "Carregando ...",
+            price: 0
         }
     ])
     const [formData, setFormData] = useState({
@@ -36,8 +36,32 @@ export default function Onboarding() {
     })
 
     useEffect(() => {
+        if (status === "loading") return // Still loading
+
+        if
+
+        if (!session) {
+                router.push("/auth/signin")
+                return
+            }
+
         handlerGetPlans()
-    }, [])
+    }, [session, status])
+
+    if (status === "loading") {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+                    <p>Carregando...</p>
+                </div>
+            </div>
+        )
+    }
+
+    if (!session) {
+        return null
+    }
 
     const handlerGetPlans = async () => {
         try {
@@ -187,7 +211,6 @@ export default function Onboarding() {
                                     {plans.map((plan) =>
                                         <SelectItem key={plan.id} value={plan.id}>{plan.name} - R$ {Number(plan.price).toFixed(2)}/mês</SelectItem>
                                     )}
-
 
                                 </SelectContent>
                             </Select>
