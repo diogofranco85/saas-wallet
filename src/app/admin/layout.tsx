@@ -1,6 +1,5 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
 import { UserNav } from "@/components/user-nav"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -54,7 +53,7 @@ export default function AdminLayout({
             <header className="bg-gray-700 shadow-sm border-b">
                 <div className="container mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-semibold text-teal-300">Painel Administrativo</h1>
+                        <h1 className="text-2xl font-semibold text-slate-300">Painel Administrativo</h1>
                         <UserNav />
                     </div>
                 </div>
