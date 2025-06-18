@@ -6,10 +6,10 @@ interface Params {
     id: string
 }
 
-export async function DELETE(_: Request, { params: { id: memberId } }: { params: Params }) {
+export async function DELETE(_: Request, { params }: { params: Promise<Params> }) {
     try {
         const supabase = createRouteHandlerClient({ cookies })
-
+        const { id: memberId } = await params;
         const {
             data: { user: currentUser },
         }: any = await supabase.auth.getUser()
@@ -59,9 +59,10 @@ export async function DELETE(_: Request, { params: { id: memberId } }: { params:
     }
 }
 
-export async function PATCH(request: Request, { params: { id: memberId } }: { params: Params }) {
+export async function PATCH(request: Request, { params }: { params: Promise<Params> }) {
     try {
         const supabase = createRouteHandlerClient({ cookies })
+        const { id: memberId } = await params;
 
         const {
             data: { user: currentUser },

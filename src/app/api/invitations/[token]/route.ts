@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
 import { createServerClient } from "@/lib/supabase"
 
-export async function GET(request: Request, { params }: { params: { token: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ token: string }> }) {
     try {
         const supabase = createServerClient()
-        const token = params.token
+        const { token } = await params
 
         // Buscar convite com detalhes da empresa
         const { data: invitation, error } = await supabase

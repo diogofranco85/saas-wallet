@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { createServerClient } from "@/lib/supabase"
 import { randomBytes } from "crypto"
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.email) {
@@ -12,7 +12,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         }
 
         const supabase = createServerClient()
-        const invitationId = params.id
+        const { id: invitationId } = await params
 
         // Buscar usuário e empresa
         const { data: user } = await supabase
