@@ -2,26 +2,17 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useRouter } from "next/navigation"
-import { useSession } from "next-auth/react"
 
 export default function Onboarding() {
-    const { data: session, status } = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false)
-    const [plans, setPlans] = useState([
-        {
-            id: "0",
-            name: "Carregando ...",
-            price: 0
-        }
-    ])
     const [formData, setFormData] = useState({
         name: "",
         document: "",
@@ -34,50 +25,6 @@ export default function Onboarding() {
             zipCode: "",
         },
     })
-
-    useEffect(() => {
-        if (status === "loading") return // Still loading
-
-        if (!session) {
-            router.push("/auth/signin")
-            return
-        }
-
-        handlerGetPlans()
-    }, [session, status])
-
-    if (status === "loading") {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
-                    <p>Carregando...</p>
-                </div>
-            </div>
-        )
-    }
-
-    if (!session) {
-        return null
-    }
-
-    const handlerGetPlans = async () => {
-        try {
-            const response = await fetch("/api/plans", {
-                method: "GET",
-                headers: { "Content-Type": "application/json" },
-            })
-
-            if (response.ok) {
-                const data = await response.json()
-                setPlans(data.plans)
-            }
-        } catch (error) {
-            console.error("Error creating company:", error)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -101,11 +48,11 @@ export default function Onboarding() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-indigo-100 p-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
             <Card className="w-full max-w-2xl">
                 <CardHeader>
                     <CardTitle>Configurar sua Empresa</CardTitle>
-                    <CardDescription>Vamos configurar sua conta empresarial para começar a usar o HypePay</CardDescription>
+                    <CardDescription>Vamos configurar sua conta empresarial para começar a usar o PixWallet</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -206,10 +153,9 @@ export default function Onboarding() {
                                     <SelectValue placeholder="Selecione um plano" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {plans.map((plan) =>
-                                        <SelectItem key={plan.id} value={plan.id}>{plan.name} - R$ {Number(plan.price).toFixed(2)}/mês</SelectItem>
-                                    )}
-
+                                    <SelectItem value="starter">Starter - R$ 29,90/mês</SelectItem>
+                                    <SelectItem value="professional">Professional - R$ 79,90/mês</SelectItem>
+                                    <SelectItem value="enterprise">Enterprise - R$ 199,90/mês</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>

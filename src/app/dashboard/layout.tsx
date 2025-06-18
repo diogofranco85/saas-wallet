@@ -79,6 +79,9 @@ export default function DashboardLayout({
                                 <Link href="/dashboard/reports" className="text-gray-700 hover:text-teal-600 font-medium">
                                     Relatórios
                                 </Link>
+                                <Link href="/dashboard/stripe" className="text-gray-700 hover:text-teal-600 font-medium">
+                                    Gateway de Pagamento
+                                </Link>
                             </nav>
                         </div>
 
