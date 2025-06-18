@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useSession } from "next-auth/react"
-import { User, Mail, Phone } from "lucide-react"
+import { User, Mail, Phone, Italic, PcCase } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
 
 type SessionUser = {
     name?: string | null
@@ -20,21 +21,45 @@ type SessionUser = {
 export default function ProfilePage() {
     const { data: session, update } = useSession()
     const [loading, setLoading] = useState(false)
+    const [loadingApi, setLoadingApi] = useState(false)
     const [formData, setFormData] = useState({
+        avatar: "",
         name: "",
         email: "",
         phone: "",
+        bio: "",
     })
 
     useEffect(() => {
         if (session?.user) {
-            setFormData({
-                name: session.user.name || "",
-                email: session.user.email || "",
-                phone: "", // This would come from your database
-            })
+            getUser();
         }
     }, [session])
+
+    const getUser = async () => {
+        setLoadingApi(true)
+        try {
+            const id = session?.user.id
+            const response = await fetch(`/api/user/profile/${id}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+            })
+
+            const { user } = await response.json();
+            setFormData({
+                avatar: user.avatar || "",
+                name: user.name || "",
+                email: user.email || "",
+                phone: user.phone, // This would come from your database
+                bio: user.bio, // This would come from your database
+            })
+        } catch (error) {
+            console.error("Error sending invite:", error)
+            alert("Erro ao carregar seus dados")
+        } finally {
+            setLoadingApi(false)
+        }
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -54,6 +79,7 @@ export default function ProfilePage() {
                     user: {
                         ...session?.user,
                         name: formData.name,
+                        phone: formData.phone,
                     },
                 })
 
@@ -74,6 +100,17 @@ export default function ProfilePage() {
             .join("")
             .toUpperCase()
             .slice(0, 2)
+    }
+
+    if (loadingApi) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                    <p>Carregando seu perfil...</p>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -155,7 +192,20 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
 
-                                <Button type="submit" disabled={loading}>
+                                <div>
+                                    <Label htmlFor="bio">Biografia</Label>
+                                    <div className="relative">
+                                        <PcCase className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                        <Textarea
+                                            id="bio"
+                                            value={formData.bio}
+                                            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                                            className="pl-10 mt-1"
+                                        />
+                                    </div>
+                                </div>
+
+                                <Button type="submit" disabled={loading} className="bg-teal-700 hover:bg-teal-900">
                                     {loading ? "Salvando..." : "Salvar Alterações"}
                                 </Button>
                             </form>

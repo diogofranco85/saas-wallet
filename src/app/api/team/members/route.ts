@@ -19,22 +19,18 @@ export async function GET() {
             return NextResponse.json({ error: "Company not found" }, { status: 404 })
         }
 
-        // Buscar dados da carteira
-        const { data: wallet, error } = await supabase
-            .from("wallets")
-            .select("*")
+        // Buscar membros da equipe
+        const { data: members, error } = await supabase
+            .from("users")
+            .select("id, name, email, role, status, avatar_url, created_at")
             .eq("company_id", user.company_id)
-            .single()
+            .order("created_at", { ascending: false })
 
         if (error) throw error
 
-        return NextResponse.json({
-            balance: Number.parseFloat(wallet.balance || "0"),
-            availableBalance: Number.parseFloat(wallet.available_balance || "0"),
-            pendingBalance: Number.parseFloat(wallet.pending_balance || "0"),
-        })
-    } catch (error: any) {
-        console.error("Error fetching wallet:", error)
-        return NextResponse.json({ error: "Internal server error", message: error.message }, { status: 500 })
+        return NextResponse.json({ members })
+    } catch (error) {
+        console.error("Error fetching team members:", error)
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 })
     }
 }

@@ -18,7 +18,7 @@ export async function PUT(request: NextRequest) {
             .from("users")
             .update({
                 name: data.name,
-                // Add other fields as needed
+                phone: data.phone// Add other fields as needed
             })
             .eq("email", session.user.email)
 
