@@ -4,11 +4,9 @@ import type React from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { UserNav } from "@/components/user-nav"
-import { Button } from "@/components/ui/button"
-import { Bell, Menu } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import { AppHeader } from "@/components/app-header"
+import { AppSidebar } from "@/components/app-siderbar"
 
 export default function DashboardLayout({
     children,
@@ -35,9 +33,9 @@ export default function DashboardLayout({
 
     if (status === "loading") {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
                     <p>Carregando...</p>
                 </div>
             </div>
@@ -49,62 +47,12 @@ export default function DashboardLayout({
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {process.env.NEXT_PUBLIC_STAGE !== 'prod' && <div className="flex justify-center bg-yellow-100 p-2">
-                <p className="font-semibold">AMBIENTE DE TESTES</p>
-            </div>
-            }
-            {/* Top Navigation */}
-            <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-                <div className="container mx-auto px-4">
-                    <div className="flex items-center justify-between h-16">
-                        {/* Logo and Navigation */}
-                        <div className="flex items-center space-x-8">
-                            <Link href="/dashboard" className="flex items-center space-x-2">
-                                <div className="text-2xl font-bold text-teal-600">
-                                    <Image src="/hype-pay.png" alt="Hype Pay" width={150} height={100} />
-                                </div>
-                            </Link>
-
-                            <nav className="hidden md:flex items-center space-x-6">
-                                <Link href="/dashboard" className="text-gray-700 hover:text-teal-600 font-medium">
-                                    Dashboard
-                                </Link>
-                                <Link href="/dashboard/charges" className="text-gray-700 hover:text-teal-600 font-medium">
-                                    Cobranças
-                                </Link>
-                                <Link href="/dashboard/team" className="text-gray-700 hover:text-teal-600 font-medium">
-                                    Equipe
-                                </Link>
-                                <Link href="/dashboard/reports" className="text-gray-700 hover:text-teal-600 font-medium">
-                                    Relatórios
-                                </Link>
-                                <Link href="/dashboard/stripe" className="text-gray-700 hover:text-teal-600 font-medium">
-                                    Gateway de Pagamento
-                                </Link>
-                            </nav>
-                        </div>
-
-                        {/* Right side - Notifications and User */}
-                        <div className="flex items-center space-x-4">
-                            <Button variant="ghost" size="sm" className="relative ">
-                                <Bell className="h-5 w-5" />
-                                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
-                            </Button>
-
-                            <UserNav />
-
-                            {/* Mobile menu button */}
-                            <Button variant="ghost" size="sm" className="md:hidden">
-                                <Menu className="h-5 w-5" />
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            {/* Main Content */}
-            <main>{children}</main>
-        </div>
+        <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset>
+                <AppHeader />
+                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+            </SidebarInset>
+        </SidebarProvider>
     )
 }

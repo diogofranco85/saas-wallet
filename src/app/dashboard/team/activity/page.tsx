@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Activity, UserPlus, UserMinus, Edit, Mail } from "lucide-react"
+import { getActivityStatusMap } from "@/helpers/getActivityStatusMap"
 
 interface TeamActivity {
     id: string
@@ -113,7 +114,7 @@ export default function TeamActivityPage() {
                                         <div className="flex items-center justify-between">
                                             <p className="text-sm font-medium">{activity.description}</p>
                                             <Badge className={getActivityColor(activity.type)} variant="secondary">
-                                                {activity.type.replace("_", " ")}
+                                                {getActivityStatusMap(activity.type)}
                                             </Badge>
                                         </div>
                                         <div className="flex items-center space-x-2 mt-1">
