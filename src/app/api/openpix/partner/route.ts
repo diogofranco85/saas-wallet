@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return partner;
+    return NextResponse.json({ partner });
 
   } catch (error) {
     console.error("Error creating Stripe account:", error)
