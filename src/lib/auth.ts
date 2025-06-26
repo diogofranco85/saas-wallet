@@ -33,6 +33,9 @@ export const authOptions: NextAuthOptions = {
             }
             return true
         },
+
+
+
         async session({ session, token }: { session: any, token: any }) {
             if (session.user?.email) {
                 const { data: user } = await supabase
@@ -52,5 +55,7 @@ export const authOptions: NextAuthOptions = {
     },
     pages: {
         signIn: "/auth/signin",
+        signOut: "/auth/signout",
+        newUser: "/auth/signup"
     },
 }

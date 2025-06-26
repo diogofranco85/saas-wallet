@@ -28,13 +28,13 @@ export default function SignIn() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-500 to-teal-700">
-            <Card className="w-full h-screen flex max-w-md">
+            <Card className="w-full max-w-md">
                 <CardHeader className="text-center">
                     <div className="flex justify-center">
                         <Image src="/hype-pay.png" alt="Hype Pay" width={150} height={100} className="m-2" />
                     </div>
                     <CardTitle className="text-2xl font-bold">Bem-vindo</CardTitle>
-                    <CardDescription>Entre com sua conta Google para acessar o dashboard</CardDescription>
+                    <CardDescription>Entre com sua conta Google para continuar</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Button onClick={handleGoogleSignIn} className="w-full bg-teal-700 hover:bg-teal-900" size="lg">
