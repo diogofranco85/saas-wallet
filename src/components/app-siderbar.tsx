@@ -14,6 +14,7 @@ import {
   FileText,
   HelpCircle,
   ChevronRight,
+  ArrowUpRightFromSquare,
 } from "lucide-react"
 
 import {
@@ -165,12 +166,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-4 py-2">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Wallet className="size-4" />
-          </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold text-teal-800">HypePay</span>
-            <span className="truncate text-xs text-muted-foreground">{session?.user?.company?.name || "Empresa"}</span>
+            <div className="flex justify-center my-4">
+              <ArrowUpRightFromSquare className="mr-3 text-pink-600" size={36} />
+              <p className="flex text-gray-800 text-2xl">
+                Hype pay
+              </p>
+            </div>
+            <span className="text-center truncate text-xs text-muted-foreground">{session?.user?.company?.name || "Empresa"}</span>
           </div>
         </div>
       </SidebarHeader>
@@ -178,7 +181,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         {/* Menu Principal */}
         <SidebarGroup>
-          <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-pink-700 text-md">Menu Principal</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -187,7 +190,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <Collapsible
                       asChild
                       defaultOpen={item.items.some((subItem) => pathname === subItem.url)}
-                      className="group/collapsible"
+                      className="group/collapsible "
                     >
                       <SidebarMenuItem>
                         <CollapsibleTrigger asChild>
@@ -228,7 +231,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
         {/* Configurações */}
         <SidebarGroup className="mt-auto">
-          <SidebarGroupLabel>Configurações</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-pink-700 text-md">Configurações</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {settingsItems.map((item) => (

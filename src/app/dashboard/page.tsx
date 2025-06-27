@@ -137,7 +137,7 @@ export default function Dashboard() {
         description="Visão geral da sua carteira e atividades recentes"
         action={
           <Link href="/dashboard/charges/new">
-            <Button>
+            <Button className="bg-pink-800 hover:bg-pink-900">
               <Plus className="mr-2 h-4 w-4" />
               Nova Cobrança
             </Button>

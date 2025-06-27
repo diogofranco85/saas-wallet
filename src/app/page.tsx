@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/helpers/formatCurrency"
-import { ArrowRight, Shield, Zap, Users, BarChart3 } from "lucide-react"
+import { ArrowRight, Shield, Zap, Users, BarChart3, ArrowUpRightFromSquare } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -20,12 +20,14 @@ interface IPlans {
 export default function LandingPage() {
 
   const [plans, setPlans] = useState<IPlans[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     handlerLoadPlans();
   }, [])
 
   const handlerLoadPlans = async () => {
+    setLoading(true)
     try {
       const response = await fetch("/api/public/plans", {
         method: "GET"
@@ -38,24 +40,42 @@ export default function LandingPage() {
 
       const { plans: apiPlansData } = await response.json()
       setPlans(apiPlansData)
-    } catch (error) {
-
+    } catch (error: any) {
+      toast.error("Error", { description: error.message })
+    } finally {
+      setLoading(false)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-700 to-gray-900">
+        <div className="text-center text-white">
+          <div className="animate-spin size-5 rounded-full h-12 w-12 border-b-4  border-white mx-auto mb-4"></div>
+          <p>Carregando dados... por favor aguarde alguns segundos</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-700 to-gray-900">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
+        <nav className="flex flex-col md:flex-row items-center justify-between">
           <div className="text-2xl font-bold text-teal-600">
-            <Image src="/hype-pay.png" alt="Hype Pay" width={200} height={150} />
+            <div className="flex justify-center my-4">
+              <p className="flex text-white text-3xl font-light">
+                <ArrowUpRightFromSquare className="mr-3 text-pink-600" size={36} />
+                Hypepay
+              </p>
+            </div>
           </div>
-          <div className="space-x-4">
-            <Link href="/auth/signin">
+          <div className="space-x-4 mt-3">
+            <Link href="/auth/signin" className="w-20">
               <Button variant="outline">Entrar</Button>
             </Link>
-            <Link href="/auth/signin">
+            <Link href="/auth/signin" className="w-100">
               <Button className="bg-pink-500 hover:bg-pink-700">Começar Grátis</Button>
             </Link>
           </div>
