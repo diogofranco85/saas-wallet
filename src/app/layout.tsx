@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
-import { Roboto_Flex } from "next/font/google"
+import { DM_Sans } from "next/font/google"
 import type React from "react"
 import "./globals.css"
 import { Providers } from "./provider"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/sonner"
 
-const font = Roboto_Flex({ subsets: ["latin"] })
+const font = DM_Sans({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "HypePay - Carteira Virtual com PIX",

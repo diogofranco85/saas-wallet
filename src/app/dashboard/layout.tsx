@@ -8,6 +8,10 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import { AppHeader } from "@/components/app-header"
 import { AppSidebar } from "@/components/app-siderbar"
 import { ToastProvider } from "@/components/ui/toast"
+import { DM_Sans } from "next/font/google"
+import { cn } from "@/lib/utils"
+
+const font = DM_Sans({ subsets: ["latin"] })
 
 export default function DashboardLayout({
   children,
@@ -48,14 +52,18 @@ export default function DashboardLayout({
   }
 
   return (
-    <ToastProvider swipeDirection="right">
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset>
-          <AppHeader />
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
-        </SidebarInset>
-      </SidebarProvider>
-    </ToastProvider>
+    <html lang="pt-BR">
+      <body className={cn(font.className, 'bg-gray-800')}>
+        <ToastProvider swipeDirection="right">
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset>
+              <AppHeader />
+              <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+            </SidebarInset>
+          </SidebarProvider>
+        </ToastProvider>
+      </body>
+    </html >
   )
 }

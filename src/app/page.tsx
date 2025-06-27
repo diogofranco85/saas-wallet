@@ -32,10 +32,9 @@ export default function LandingPage() {
       })
 
       if (!response.ok) {
-        toast("Error ao carregar os planos")
+        toast.error("Error", { description: "Houve um error ao buscar os dados" })
+        return;
       }
-
-      toast.error("Error", { description: "Houve um error ao buscar os dados" })
 
       const { plans: apiPlansData } = await response.json()
       setPlans(apiPlansData)
