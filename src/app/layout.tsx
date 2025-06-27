@@ -1,10 +1,12 @@
-import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Roboto_Flex } from "next/font/google"
+import type React from "react"
 import "./globals.css"
 import { Providers } from "./provider"
+import { cn } from "@/lib/utils"
+import { Toaster } from "@/components/ui/sonner"
 
-const inter = Inter({ subsets: ["latin"] })
+const font = Roboto_Flex({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "HypePay - Carteira Virtual com PIX",
@@ -18,8 +20,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>
-        <Providers>{children}</Providers>
+      <body className={cn(font.className, 'bg-gray-800')}>
+        <Providers>
+          {children}
+          <Toaster position="top-right" toastOptions={{
+            style: {
+              background: "#1f2937",
+              color: "#be185d"
+            }
+          }} />
+        </Providers>
       </body>
     </html>
   )
