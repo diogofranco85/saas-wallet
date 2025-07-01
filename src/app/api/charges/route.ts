@@ -2,7 +2,6 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { createServerClient } from "@/lib/supabase"
-import { stripe, STRIPE_CONFIG } from "@/lib/stripe"
 import { createBilling } from "@/lib/openpix"
 import { TaxTypeEnum } from "@/enums/tax-type.enum"
 

@@ -1,4 +1,6 @@
 "use client"
+import { CustomCard } from "@/components/custom-card";
+import { CustomContainer } from "@/components/custom-container";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,8 +9,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Copy, Mail, RefreshCw, Trash2, UserPlus } from "lucide-react";
+import { ArrowLeft, Copy, Mail, RefreshCw, Trash2, UserPlus } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -179,21 +182,35 @@ export default function TeamInvitationsPage() {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6">
+    <CustomContainer>
       <PageHeader
+        leftAction={
+          <Link href="/dashboard/charges">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar
+            </Button>
+          </Link>
+        }
         title="Membros - Convites"
         description="Visão geral do seus convites recentes"
         action={
-          <Button className="bg-pink-900 hover:bg-pink-800" onClick={() => setInviteDialogOpen(true)}>
+          <Button className="bg-pink-700 hover:bg-pink-800" onClick={() => setInviteDialogOpen(true)}>
             <UserPlus className="mr-2 h-4 w-4 " />
             Convidar Membro
           </Button>
         }
+        breadcrumbs={[
+          { title: "Dashboard", href: "/dashboard" },
+          { title: "Equipe", href: "/dashboard/team" },
+          { title: "Convites" }
+        ]}
       />
+
 
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
 
-        <Card>
+        <CustomCard>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Mail className="mr-2 h-5 w-5" />
@@ -247,7 +264,7 @@ export default function TeamInvitationsPage() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </CustomCard>
 
         {canInvite && (
           <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
@@ -296,6 +313,6 @@ export default function TeamInvitationsPage() {
           </Dialog>
         )}
       </div>
-    </div>
+    </CustomContainer>
   )
 }

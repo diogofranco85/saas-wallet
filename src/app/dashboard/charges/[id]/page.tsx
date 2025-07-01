@@ -1,30 +1,34 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { CustomCard } from "@/components/custom-card"
+import { CustomLoading } from "@/components/loading"
+import { PageHeader } from "@/components/page-header"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Timeline, TimelineDate, TimelineHeader, TimelineIndicator, TimelineItem, TimelineSeparator, TimelineTitle } from "@/components/ui/timeline"
+import { formatDate } from "@/helpers/formatDate"
+import { formatDocument } from "@/helpers/formatDocument"
 import {
   ArrowLeft,
-  Copy,
-  QrCode,
-  User,
-  Mail,
-  FileText,
   Calendar,
-  DollarSign,
-  Clock,
   CheckCircle,
-  XCircle,
+  Clock,
+  Copy,
+  DollarSign,
+  FileText,
+  Mail,
+  QrCode,
   RefreshCw,
+  User,
+  XCircle,
 } from "lucide-react"
-import Link from "next/link"
 import Image from "next/image"
-import { Timeline, TimelineDate, TimelineHeader, TimelineIndicator, TimelineItem, TimelineSeparator, TimelineTitle } from "@/components/ui/timeline"
-import { getStatusMap } from "@/helpers/getStatusMap"
-import { formatDocument } from "@/helpers/formatDocument"
+import Link from "next/link"
+import { useParams, useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 interface ChargeDetails {
   id: string
@@ -100,6 +104,11 @@ export default function ChargeDetailsPage() {
   const handleStatusChange = async (newStatus: string) => {
     if (!charge) return
 
+    if (newStatus === 'pending' && isExpired(charge.created_at)) {
+      toast.error("Não é possivel ativar uma cobrança expirada")
+      return;
+    }
+
     try {
       const response = await fetch(`/api/charges/${charge.id}`, {
         method: "PATCH",
@@ -121,7 +130,7 @@ export default function ChargeDetailsPage() {
     setCopying(true)
     try {
       await navigator.clipboard.writeText(text)
-      // You could add a toast notification here
+      toast.success("QR Code copiado")
     } catch (error) {
       console.error("Error copying to clipboard:", error)
     } finally {
@@ -134,10 +143,6 @@ export default function ChargeDetailsPage() {
       style: "currency",
       currency: "BRL",
     }).format(value)
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("pt-BR")
   }
 
   const getStatusColor = (status: string) => {
@@ -197,14 +202,7 @@ export default function ChargeDetailsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Carregando detalhes da cobrança...</p>
-        </div>
-      </div>
-    )
+    <CustomLoading text="Carregando detalhes da cobrança..." />
   }
 
   if (!charge) {
@@ -222,31 +220,32 @@ export default function ChargeDetailsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex items-center space-x-4 mb-8">
-        <Link href="/dashboard/charges">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar
-          </Button>
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-foreground">Detalhes da Cobrança</h1>
-          <p className="text-muted-foreground">ID: {charge.id}</p>
-        </div>
-        <div className="flex items-center space-x-2">
-          {getStatusIcon(charge.status)}
-          <Badge className={getStatusColor(charge.status)}>
-            {getStatusText(charge.status)}
-          </Badge>
-        </div>
-      </div>
+      <PageHeader
+        leftAction={
+          <Link href="/dashboard/charges">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar
+            </Button>
+          </Link>
+        }
+        title="Detalhes da Cobrança"
+        description={`ID: ${charge.id}`}
+        action={
+          <div className="flex items-center space-x-2">
+            {getStatusIcon(charge.status)}
+            <Badge className={getStatusColor(charge.status)}>
+              {getStatusText(charge.status)}
+            </Badge>
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Details */}
         <div className="lg:col-span-2 space-y-6">
           {/* Charge Information */}
-          <Card>
+          <CustomCard>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <FileText className="mr-2 h-5 w-5" />
@@ -307,10 +306,10 @@ export default function ChargeDetailsPage() {
                 </div>
               )}
             </CardContent>
-          </Card>
+          </CustomCard>
 
           {/* Payer Information */}
-          <Card>
+          <CustomCard>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <User className="mr-2 h-5 w-5" />
@@ -346,10 +345,10 @@ export default function ChargeDetailsPage() {
                 <p className="text-muted-foreground">Nenhuma informação do pagador fornecida</p>
               )}
             </CardContent>
-          </Card>
+          </CustomCard>
 
           {/* Actions */}
-          <Card>
+          <CustomCard>
             <CardHeader>
               <CardTitle>Ações</CardTitle>
             </CardHeader>
@@ -377,14 +376,14 @@ export default function ChargeDetailsPage() {
                 )}
               </div>
             </CardContent>
-          </Card>
+          </CustomCard>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* QR Code */}
           {charge.qr_code && (
-            <Card>
+            <CustomCard>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <QrCode className="mr-2 h-5 w-5" />
@@ -412,12 +411,12 @@ export default function ChargeDetailsPage() {
                   {copying ? "Copiando..." : "Copiar QR Code"}
                 </Button>
               </CardContent>
-            </Card>
+            </CustomCard>
           )}
 
           {/* PIX Key */}
           {charge.pix_key && (
-            <Card>
+            <CustomCard>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <DollarSign className="mr-2 h-5 w-5" />
@@ -426,7 +425,7 @@ export default function ChargeDetailsPage() {
                 <CardDescription>Chave para pagamento manual</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="bg-muted p-3 rounded-lg">
+                <div className="bg-muted p-3 rounded-lg border border-pink-600">
                   <code className="text-sm break-all">{charge.pix_key}</code>
                 </div>
                 <Button
@@ -439,11 +438,11 @@ export default function ChargeDetailsPage() {
                   {copying ? "Copiando..." : "Copiar Chave"}
                 </Button>
               </CardContent>
-            </Card>
+            </CustomCard>
           )}
 
           {/* Quick Stats */}
-          <Card>
+          <CustomCard>
             <CardHeader>
               <CardTitle>Resumo</CardTitle>
             </CardHeader>
@@ -469,8 +468,8 @@ export default function ChargeDetailsPage() {
                 </div>
               )}
             </CardContent>
-          </Card>
-          <Card>
+          </CustomCard>
+          <CustomCard>
             <CardHeader>
               <CardTitle>Histórico</CardTitle>
             </CardHeader>
@@ -498,7 +497,7 @@ export default function ChargeDetailsPage() {
               </Timeline>
 
             </CardContent>
-          </Card>
+          </CustomCard>
         </div>
       </div>
     </div>

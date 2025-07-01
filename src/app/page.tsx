@@ -1,9 +1,9 @@
 "use client"
+import { CustomCard } from "@/components/custom-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/helpers/formatCurrency"
-import { ArrowRight, Shield, Zap, Users, BarChart3, ArrowUpRightFromSquare } from "lucide-react"
-import Image from "next/image"
+import { ArrowRight, ArrowUpRightFromSquare, BarChart3, Shield, Users, Zap } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -104,7 +104,7 @@ export default function LandingPage() {
       <section className="container mx-auto px-4 py-20">
         <h2 className="text-3xl text-center mb-12 text-white">Por que escolher o HypePay?</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <Card className="bg-slate-800 border-slate-700">
+          <CustomCard className="bg-slate-800 border-slate-700">
             <CardHeader>
               <Zap className="h-10 w-10 text-pink-600 mb-2" />
               <CardTitle className="text-white">PIX Instantâneo</CardTitle>
@@ -112,9 +112,9 @@ export default function LandingPage() {
             <CardContent>
               <CardDescription className="text-white">Receba pagamentos PIX em tempo real com confirmação automática</CardDescription>
             </CardContent>
-          </Card>
+          </CustomCard>
 
-          <Card className="bg-slate-800 border-slate-700">
+          <CustomCard className="bg-slate-800 border-slate-700">
             <CardHeader>
               <Shield className="h-10 w-10 text-pink-600 mb-2" />
               <CardTitle className="text-white">Segurança Total</CardTitle>
@@ -122,9 +122,9 @@ export default function LandingPage() {
             <CardContent>
               <CardDescription className="text-white">Integração segura com Stripe e criptografia de ponta a ponta</CardDescription>
             </CardContent>
-          </Card>
+          </CustomCard>
 
-          <Card className="bg-slate-800 border-slate-700">
+          <CustomCard className="bg-slate-800 border-slate-700">
             <CardHeader>
               <Users className="h-10 w-10 text-pink-600 mb-2" />
               <CardTitle className="text-white">Equipe Colaborativa</CardTitle>
@@ -132,9 +132,9 @@ export default function LandingPage() {
             <CardContent>
               <CardDescription className="text-white">Convide funcionários e gerencie permissões de acesso</CardDescription>
             </CardContent>
-          </Card>
+          </CustomCard>
 
-          <Card className="bg-slate-800 border-slate-700">
+          <CustomCard className="bg-slate-800 border-slate-700">
             <CardHeader>
               <BarChart3 className="h-10 w-10 text-pink-600 mb-2" />
               <CardTitle className="text-white">Relatórios Completos</CardTitle>
@@ -142,7 +142,7 @@ export default function LandingPage() {
             <CardContent>
               <CardDescription className="text-white">Acompanhe todas as transações e performance da sua carteira</CardDescription>
             </CardContent>
-          </Card>
+          </CustomCard>
         </div>
       </section>
 
@@ -152,7 +152,7 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
           {plans.map(plan => {
             return (
-              <Card className="bg-slate-800 border-slate-700">
+              <CustomCard className="bg-slate-800 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-slate-100">{plan.name}</CardTitle>
                   <CardDescription className="text-gray-300">{plan.description}</CardDescription>
@@ -169,11 +169,9 @@ export default function LandingPage() {
                     {plan.features.brand && <li>• {plan.features.brand}</li>}
                   </ul>
                 </CardContent>
-              </Card>
+              </CustomCard>
             )
           })}
-
-
         </div>
       </section>
 

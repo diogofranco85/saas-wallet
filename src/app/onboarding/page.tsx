@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
+import { formatCurrency } from "@/helpers/formatCurrency"
 
 
 
@@ -212,7 +213,7 @@ export default function Onboarding() {
 
                   {!plans && <SelectItem value="0">Carregando</SelectItem>}
                   {plans.map(plan =>
-                    <SelectItem key={plan.id} value={plan.id}>{plan.name} - R$ {plan.price}/mês</SelectItem>
+                    <SelectItem key={plan.id} value={plan.id} className="text-pink-600 bg-gray-400">{plan.name} - {formatCurrency(plan.price)}/mês</SelectItem>
                   )}
                 </SelectContent>
               </Select>
