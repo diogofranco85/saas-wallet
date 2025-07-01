@@ -75,7 +75,12 @@ export function AppHeader() {
     const channels = supabase.channel('realtime:notifications')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'notifications', filter: 'some_column=eq.some_value' },
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${session?.user.id}`
+        },
         (payload) => {
           console.log('Change received!', payload)
         }

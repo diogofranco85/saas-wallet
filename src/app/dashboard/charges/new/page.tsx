@@ -13,6 +13,7 @@ import { ArrowLeft, BadgeXIcon } from "lucide-react"
 import Link from "next/link"
 import { PageHeader } from "@/components/page-header"
 import { CustomContainer } from "@/components/custom-container"
+import MoneyInput from "@/components/custom-money-input"
 
 export default function NewCharge() {
   const router = useRouter()
@@ -52,7 +53,6 @@ export default function NewCharge() {
 
   return (
     <CustomContainer>
-
       <PageHeader
         leftAction={
           <Link href="/dashboard/charges">
