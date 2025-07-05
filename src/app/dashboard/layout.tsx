@@ -54,7 +54,7 @@ export default function DashboardLayout({
   return (
     <html lang="pt-BR">
       <body className={cn(font.className, 'bg-gray-800')}>
-        <ToastProvider swipeDirection="right">
+        <ToastProvider swipeDirection="right" >
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset>

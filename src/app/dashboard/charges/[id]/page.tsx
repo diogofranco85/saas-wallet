@@ -147,6 +147,8 @@ export default function ChargeDetailsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case "created":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
       case "paid":
         return "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300"
       case "pending":

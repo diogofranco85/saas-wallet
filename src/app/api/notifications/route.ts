@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "10")
-    const touched = searchParams.get("touched") || false
+    const touched = searchParams.get("touched") || "false"
     const search = searchParams.get("search") || ""
     const sortBy = searchParams.get("sortBy") || "created_at"
     const sortOrder = searchParams.get("sortOrder") || "desc"
@@ -25,24 +25,23 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServerClient()
 
-    let query;
-    const { data: notifications, error: notificationsError, count } = await supabase
+    let query = supabase
       .from("notifications")
       .select("*", { count: "exact" })
-    // .eq("user_id", session.user.id)
+      .eq("user_id", session.user.id)
+
+    if (touched) {
+      query = query.eq("touched", touched)
+    }
+
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,message.ilike.%${search}%`)
+    }
+
+    const { data: notifications, error: notificationsError, count } = await query.order(sortBy, { ascending: sortOrder === "asc" })
 
 
-    // if (search) {
-    //   query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
-    // }
-
-    // if (touched) {
-    //   query = query.eq("touched", touched)
-    // }
-
-    // query = query.order(sortBy, { ascending: sortOrder === "asc" })
-
-    // const { data: notifications, error: notificationsError, count } = await query.range(offset, offset * limit - 1)
+    // const { data: notifications, error: notificationsError, count  } = await query.range(offset, offset * limit - 1)
 
     if (notificationsError) {
       throw notificationsError;
@@ -61,6 +60,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error: any) {
     console.error("Error creating company:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ error: "Internal server error", message: error.message }, { status: 500 })
   }
 }

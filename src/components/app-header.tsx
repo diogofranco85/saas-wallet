@@ -54,7 +54,7 @@ export function AppHeader() {
   const loadNotification = async () => {
 
     try {
-      const response = await fetch("/api/notifications?page=1&limit=10", { method: "GET" })
+      const response = await fetch("/api/notifications?page=1&limit=10?touched=false", { method: "GET" })
 
       if (!response.ok) {
         toast.error("Notificações", { description: "Error ao carregar as notificações" })

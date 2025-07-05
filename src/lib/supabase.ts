@@ -1,3 +1,4 @@
+import { Database } from "@/types/database.supabase"
 import { createClient } from "@supabase/supabase-js"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -8,5 +9,5 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Server-side client
 export const createServerClient = () => {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, supabaseAnonKey)
+  return createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, supabaseAnonKey)
 }

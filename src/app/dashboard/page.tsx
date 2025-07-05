@@ -1,23 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { PageHeader } from "@/components/page-header"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { formatCurrency } from "@/helpers/formatCurrency"
+import { formatDate } from "@/helpers/formatDate"
+import { formatDocument } from "@/helpers/formatDocument"
 import {
-  Wallet,
+  ArrowDownRight,
+  ArrowUpRight,
+  CreditCard,
+  DollarSign,
+  Eye,
+  Plus,
   TrendingUp,
   Users,
-  Plus,
-  Eye,
-  DollarSign,
-  CreditCard,
-  ArrowUpRight,
-  ArrowDownRight,
+  Wallet,
 } from "lucide-react"
 import Link from "next/link"
-import { PageHeader } from "@/components/page-header"
-import { formatDate } from "@/helpers/formatDate"
+import { useEffect, useState } from "react"
 
 interface WalletData {
   balance: number
@@ -30,8 +33,10 @@ interface RecentCharge {
   amount: number
   description: string
   status: string
-  createdAt: string
-  payerName?: string
+  created_at: string
+  payer_name?: string
+  payer_document?: string
+  expires_at: string
 }
 
 interface DashboardStats {
@@ -62,7 +67,10 @@ export default function Dashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [walletResponse, chargesResponse] = await Promise.all([fetch("/api/wallet"), fetch("/api/charges?limit=5")])
+      const [walletResponse, chargesResponse] = await Promise.all([
+        fetch("/api/wallet"),
+        fetch("/api/charges?limit=5")
+      ])
 
       const walletData = await walletResponse.json()
       const chargesData = await chargesResponse.json()
@@ -99,6 +107,8 @@ export default function Dashboard() {
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
       case "expired":
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+      case "cancelled":
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
     }
@@ -305,40 +315,83 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="space-y-4">
-              {recentCharges.map((charge) => (
-                <div
-                  key={charge.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <div>
-                      <p className="font-medium">{charge.description}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {charge.payerName && `Para: ${charge.payerName} • `}
-                        {formatDate(charge.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="text-right">
-                      <p className="font-bold">{formatCurrency(charge.amount)}</p>
-                      <Badge className={getStatusColor(charge.status)} variant="secondary">
-                        {getStatusText(charge.status)}
-                      </Badge>
-                    </div>
-                    <Link href={`/dashboard/charges/${charge.id}`}>
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID:</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Documento</TableHead>
+                    <TableHead>Criado em</TableHead>
+                    <TableHead>Expira em</TableHead>
+                    <TableHead>Valor</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Ação</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentCharges.map((charge) => {
+                    return (
+                      <TableRow key={charge.id}>
+                        <TableCell>{charge.id.slice(0, 10)}</TableCell>
+                        <TableCell>{charge.payer_name}</TableCell>
+                        <TableCell>{formatDocument(String(charge.payer_document))}</TableCell>
+                        <TableCell>{formatDate(charge.created_at)}</TableCell>
+                        <TableCell>{formatDate(charge.expires_at)}</TableCell>
+                        <TableCell>{formatCurrency(charge.amount)}</TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(charge.status)}>{getStatusText(charge.status)}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Link href={`/dashboard/charges/${charge.id}`}>
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                  {
+                    // <div
+                    //   key={charge.id}
+                    //   className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    // >
+                    //   <div className="flex items-center space-x-4">
+                    //     <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    //     <div>
+                    //       <p className="font-medium">{charge.description}</p>
+                    //       <p className="text-sm text-muted-foreground">
+
+                    //         {formatDate(charge.created_at)}
+                    //       </p>
+                    //     </div>
+                    //   </div>
+                    //   <div className="flex flex-col space-x-3">
+                    //     <p className="text-left">{charge.payer_name}</p>
+                    //     <p className="text-left">{formatDocument(String(charge.payer_document))}</p>
+                    //   </div>
+                    //   <div className="flex items-center space-x-3">
+                    //     <div className="text-right">
+                    //       <p className="font-bold">{formatCurrency(charge.amount)}</p>
+                    //       <Badge className={getStatusColor(charge.status)} variant="secondary">
+                    //         {getStatusText(charge.status)}
+                    //       </Badge>
+                    //     </div>
+                    //     <Link href={`/dashboard/charges/${charge.id}`}>
+                    //       <Button variant="ghost" size="sm">
+                    //         <Eye className="h-4 w-4" />
+                    //       </Button>
+                    //     </Link>
+                    //   </div>
+                    // </div>
+                  }
+                </TableBody>
+              </Table>
+
             </div>
           )}
         </CardContent>
       </Card>
-    </div>
+    </div >
   )
 }

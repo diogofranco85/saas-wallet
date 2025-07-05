@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
         phone: data.phone,
         address: data.address,
         plan_id: data.planId,
+
       })
       .select()
       .single()

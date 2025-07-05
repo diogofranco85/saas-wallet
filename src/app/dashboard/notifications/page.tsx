@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from "@/components/ui/table"
 import { formatDate } from "@/helpers/formatDate"
-import { ArrowUpDown, ChevronLeft, ChevronRight, Plus, Search, Table } from "lucide-react"
+import { ArrowUpDown, ChevronLeft, ChevronRight, Eye, Search, X, } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 interface Pagination {
   page: number
@@ -29,7 +30,7 @@ interface INotifications {
 export default function NotificationPage() {
   // Filters
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
+  const [touchedFilter, setTouchedFilter] = useState("false")
   const [sortBy, setSortBy] = useState("created_at")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
   const [pagination, setPagination] = useState<Pagination>({
@@ -43,7 +44,9 @@ export default function NotificationPage() {
 
   const [loading, setLoading] = useState<boolean>(false)
 
-  useEffect(() => {}, [pagination.page, statusFilter, sortBy, sortOrder])
+  useEffect(() => {
+    fetchNotifications()
+  }, [pagination.page, touchedFilter, sortBy, sortOrder])
 
   const fetchNotifications = async () => {
     setLoading(true)
@@ -51,7 +54,7 @@ export default function NotificationPage() {
       const params = new URLSearchParams({
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
-        touched: statusFilter !== "all" ? statusFilter : "",
+        touched: touchedFilter !== "all" ? touchedFilter : "",
         search: searchTerm,
         sortBy,
         sortOrder,
@@ -72,6 +75,28 @@ export default function NotificationPage() {
   const handleSearch = () => {
     setPagination({ ...pagination, page: 1 })
     fetchNotifications()
+  }
+
+  const handlerExcludeNotification = async (id: string) => {
+    setLoading(true)
+    try {
+      const response = await fetch(`/api/notifications/${id}`, {
+        method: "DELETE",
+      })
+
+      if (response.ok) {
+        setNotifications(notifications.filter((notification) => notification.id !== id))
+        // Optionally, you can refetch notifications after deletion
+        fetchNotifications()
+        toast.success("Notificação excluída com sucesso")
+      } else {
+        console.error("Failed to delete notification")
+      }
+    } catch (error) {
+      console.error("Error deleting notification:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (loading) {
@@ -109,7 +134,7 @@ export default function NotificationPage() {
               />
             </div>
 
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value={touchedFilter} onValueChange={setTouchedFilter}>
               <SelectTrigger>
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -126,7 +151,7 @@ export default function NotificationPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="created_at">Data de Criação</SelectItem>
-                <SelectItem value="amount">Titulo</SelectItem>
+                <SelectItem value="title">Titulo</SelectItem>
               </SelectContent>
             </Select>
 
@@ -166,6 +191,7 @@ export default function NotificationPage() {
                     <TableRow>
                       <TableHead>Titulo</TableHead>
                       <TableHead>Descrição</TableHead>
+                      <TableHead>Recebido em</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -179,7 +205,27 @@ export default function NotificationPage() {
                         </TableCell>
                         <TableCell>
                           <div>
-                            <p className="text-sm">{formatDate(notification.message.slice(0, 30))}</p>
+                            <p className="text-sm">{notification.message.slice(0, 30)}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="text-sm">{formatDate(notification.created_at)}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Link href={`/dashboard/notifications/${notification.id}`}>
+                              <Button size="sm" variant="outline">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+
+
+                            <Button size="sm" variant="outline" onClick={() => handlerExcludeNotification(notification.id)}>
+                              <X className="h-4 w-4" />
+                            </Button>
+
                           </div>
                         </TableCell>
                       </TableRow>
