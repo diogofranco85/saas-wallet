@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth"
 import { createServerClient } from "@/lib/supabase"
 import { createBilling } from "@/lib/openpix"
 import { TaxTypeEnum } from "@/enums/tax-type.enum"
+import { formatDocument } from "@/helpers/formatDocument"
 
 export async function POST(request: NextRequest) {
   let chargeId;
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
         },
         {
           key: "Documento da Empresa",
-          value: company.document,
+          value: formatDocument(company.document),
         }
       ],
       costumer: {
