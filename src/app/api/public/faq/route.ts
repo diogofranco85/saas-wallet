@@ -6,18 +6,18 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createServerClient()
 
-    const { data: plans, error: plansError, status } = await supabase
-      .from("plans")
-      .select()
-      .order("price")
+    const { data: faqs, error: faqsError, status } = await supabase
+      .from("faq")
+      .select("*")
+      .order("title")
 
-    if (plansError) throw new HttpException(status, plansError.message)
+    if (faqsError) throw new HttpException(status, faqsError.message)
 
-    return NextResponse.json({ success: true, plans, public: true })
+    return NextResponse.json({ success: true, faqs, public: true })
   } catch (error) {
     if (error instanceof HttpException) {
       return NextResponse.json({ error: error.message }, { status: error.status })
     }
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    return NextResponse.json({ error: "Internal server error" }, { status: 503 })
   }
 }

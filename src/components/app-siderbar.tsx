@@ -73,10 +73,6 @@ const menuItems = [
         title: "Nova Cobrança",
         url: "/dashboard/charges/new",
       },
-      {
-        title: "Relatórios",
-        url: "/dashboard/charges/reports",
-      },
     ],
   },
   {

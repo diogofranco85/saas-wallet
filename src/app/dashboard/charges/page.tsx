@@ -269,7 +269,7 @@ export default function ChargesPage() {
                         <TableCell>
                           <div>
                             <p className="font-medium">{charge.description}</p>
-                            <p className="text-sm text-muted-foreground">ID: {charge.id.slice(0, 8)}...</p>
+                            <p className="text-sm text-muted-foreground">ID: {charge.id}...</p>
                           </div>
                         </TableCell>
                         <TableCell>
