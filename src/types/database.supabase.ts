@@ -15,8 +15,8 @@ export interface Database {
           status: string
           created_at: Date,
           updated_at: Date,
-          stripe_account_id: string
-          stripe_account_status: string
+          pix_key: string
+          pix_status: string
           stripe_account_url: string,
           stripe_dashboard_url: string
         },
@@ -28,8 +28,8 @@ export interface Database {
           address: Json,
           plan_id: string,
           status: string
-          stripe_account_id: string
-          stripe_account_status: string
+          pix_key: string
+          pix_status: string
           stripe_account_url: string,
           stripe_dashboard_url: string
         },
@@ -39,7 +39,7 @@ export interface Database {
           address: Json,
           plan_id: string,
           status: string
-          stripe_account_id: string
+          pix_key: string
         }
       }
     }

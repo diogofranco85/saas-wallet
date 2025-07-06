@@ -205,7 +205,7 @@ export default function NotificationPage() {
                         </TableCell>
                         <TableCell>
                           <div>
-                            <p className="text-sm">{notification.message.slice(0, 30)}</p>
+                            <p className="text-sm">{notification.message.slice(0, 50)}</p>
                           </div>
                         </TableCell>
                         <TableCell>

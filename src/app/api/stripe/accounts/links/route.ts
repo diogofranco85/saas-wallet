@@ -33,11 +33,11 @@ export async function POST(request: NextRequest) {
         // Buscar dados da empresa
         const { data: company } = await supabase
             .from("companies")
-            .select("stripe_account_id")
+            .select("pix_key")
             .eq("id", user.company_id)
             .single()
 
-        if (!company?.stripe_account_id) {
+        if (!company?.pix_key) {
             return NextResponse.json({ error: "Stripe account not found" }, { status: 404 })
         }
 
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
         if (type === "dashboard") {
             // Criar link para o dashboard do Stripe
-            const loginLink = await stripe.accounts.createLoginLink(company.stripe_account_id)
+            const loginLink = await stripe.accounts.createLoginLink(company.pix_key)
             linkUrl = loginLink.url
 
             // Salvar URL do dashboard
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         } else {
             // Criar link de onboarding
             const accountLink = await stripe.accountLinks.create({
-                account: company.stripe_account_id,
+                account: company.pix_key,
                 refresh_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/stripe/refresh`,
                 return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/stripe/success`,
                 type: "account_onboarding",

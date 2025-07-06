@@ -94,8 +94,8 @@ export async function POST(request: NextRequest) {
 
                 const { error } = await supabase
                     .from("companies")
-                    .update({ stripe_account_status: newStatus })
-                    .eq("stripe_account_id", account.id)
+                    .update({ pix_status: newStatus })
+                    .eq("pix_key", account.id)
 
                 if (error) {
                     console.error("Error updating account status:", error)

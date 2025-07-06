@@ -71,6 +71,7 @@ export default function ChargeDetailsPage() {
 
   const fetchChargeDetails = async (chargeId: string) => {
     try {
+      setLoading(true)
       const response = await fetch(`/api/charges/${chargeId}`)
       if (response.ok) {
         const data = await response.json()
@@ -81,8 +82,6 @@ export default function ChargeDetailsPage() {
     } catch (error) {
       console.error("Error fetching charge details:", error)
       router.push("/dashboard/charges")
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -203,21 +202,8 @@ export default function ChargeDetailsPage() {
     return status === "expired" || status === "cancelled"
   }
 
-  if (loading) {
-    <CustomLoading text="Carregando detalhes da cobrança..." />
-  }
-
-  if (!charge) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4">Cobrança não encontrada</p>
-          <Link href="/dashboard/charges">
-            <Button>Voltar para cobranças</Button>
-          </Link>
-        </div>
-      </div>
-    )
+  if (loading || !charge) {
+    return <CustomLoading text="Carregando detalhes da cobrança..." />
   }
 
   return (
@@ -350,41 +336,43 @@ export default function ChargeDetailsPage() {
           </CustomCard>
 
           {/* Actions */}
-          <CustomCard>
-            <CardHeader>
-              <CardTitle>Ações</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {canCancel(charge.status) && (
-                  <Button variant="destructive" onClick={() => handleStatusChange("cancelled")}>
-                    <XCircle className="mr-2 h-4 w-4" />
-                    Cancelar Cobrança
-                  </Button>
-                )}
+          {charge.status !== "paid" &&
+            <CustomCard>
+              <CardHeader>
+                <CardTitle>Ações</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {canCancel(charge.status) && (
+                    <Button variant="destructive" onClick={() => handleStatusChange("cancelled")}>
+                      <XCircle className="mr-2 h-4 w-4" />
+                      Cancelar Cobrança
+                    </Button>
+                  )}
 
-                {canReactivate(charge.status) && (
-                  <Button variant="outline" onClick={() => handleStatusChange("pending")}>
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Reativar Cobrança
-                  </Button>
-                )}
+                  {canReactivate(charge.status) && (
+                    <Button variant="outline" onClick={() => handleStatusChange("pending")}>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Reativar Cobrança
+                    </Button>
+                  )}
 
-                {charge.pix_key && (
-                  <Button variant="outline" onClick={() => copyToClipboard(charge.pix_key!)} disabled={copying}>
-                    <Copy className="mr-2 h-4 w-4" />
-                    {copying ? "Copiando..." : "Copiar Chave PIX"}
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </CustomCard>
+                  {charge.pix_key && (
+                    <Button variant="outline" onClick={() => copyToClipboard(charge.pix_key!)} disabled={copying}>
+                      <Copy className="mr-2 h-4 w-4" />
+                      {copying ? "Copiando..." : "Copiar Chave PIX"}
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </CustomCard>
+          }
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* QR Code */}
-          {charge.qr_code && (
+          {charge.status !== "paid" && charge.qr_code && (
             <CustomCard>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -417,7 +405,7 @@ export default function ChargeDetailsPage() {
           )}
 
           {/* PIX Key */}
-          {charge.pix_key && (
+          {charge.status !== "paid" && charge.pix_key && (
             <CustomCard>
               <CardHeader>
                 <CardTitle className="flex items-center">

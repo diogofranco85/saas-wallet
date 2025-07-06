@@ -16,6 +16,10 @@ export async function POST(request: NextRequest) {
 
     const data = await request.json()
 
+    if (data.amount <= 5.00) {
+      return NextResponse.json({ error: "Amount must be greater than 5 Reais" }, { status: 400 })
+    }
+
     // Buscar usuário e empresa
     const { data: user } = await supabase
       .from("users")
@@ -45,17 +49,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar se a empresa tem conta Stripe ativa
-    if (!company.stripe_account_id) {
+    if (!company.pix_key) {
       return NextResponse.json(
         {
-          error: "Stripe account not configured. Please complete Stripe onboarding first.",
+          error: "gateway account not configured. Please complete onboarding first.",
         },
         { status: 400 },
       )
     }
 
     // Verificar status da conta Stripe
-    // const stripeAccount = await stripe.accounts.retrieve(company.stripe_account_id)
+    // const stripeAccount = await stripe.accounts.retrieve(company.pix_key)
     // if (!stripeAccount.charges_enabled) {
     //   return NextResponse.json(
     //     {
@@ -67,10 +71,10 @@ export async function POST(request: NextRequest) {
 
     // Calcular valores
     const grossAmount = Math.round(data.amount * 100) // Converter para centavos
-    const feePercentage = company.plans?.pix_fee_percentage || 0.0199
+    const feePercentage = Math.round((grossAmount * (company.plans?.pix_fee_percentage || 0.0199) / 100))
     const feeFixed = Math.round((company.plans?.pix_fee_fixed || 0) * 100)
-    const feeAmount = Math.round(grossAmount * feePercentage) + feeFixed
-    const netAmount = grossAmount - feeAmount
+    const feeAmount = Math.round(feeFixed + feePercentage)
+    const netAmount = grossAmount - (feeAmount + feeFixed)
 
     // Criar cobrança PIX no banco
     const expiresAt = new Date()
@@ -87,8 +91,8 @@ export async function POST(request: NextRequest) {
         payer_document: data.payerDocument,
         payer_email: data.payerEmail,
         expires_at: expiresAt.toISOString(),
-        stripe_fee_amount: feeAmount / 100, // Converter de volta para reais
-        net_amount: netAmount / 100,
+        fee_amount: feeAmount, // Converter de volta para reais
+        net_amount: netAmount,
         status: "created",
       })
       .select()
@@ -96,22 +100,44 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error
 
-    chargeId = charge.id;
+    const splitValue = grossAmount - feeAmount - feeFixed;
 
+    chargeId = charge.id;
     const paymentIntent = await createBilling({
       correlationID: charge.id,
       value: grossAmount,
       comment: data.description,
+      additionalInfo: [
+        {
+          key: "Empresa",
+          value: company.name,
+        },
+        {
+          key: "ID da Empresa",
+          value: company.id,
+        },
+        {
+          key: "Documento da Empresa",
+          value: company.document,
+        }
+      ],
       costumer: {
-        email: data.payerEmail || "",
-        name: data.payerName,
-        taxID: data.payerDocument.length > 11 ? TaxTypeEnum.LEGAL_PERSON : TaxTypeEnum.INDIVIDUAL_PERSON
+        email: data.payer_email || "",
+        name: data.payer_name,
+        taxID: data.payer_document
       },
+      splits: [
+        {
+          value: splitValue,
+          pixKey: company.pix_key || "",
+          splitType: "SPLIT_SUB_ACCOUNT"
+        }
+      ]
     })
 
     await supabase.from("pix_charges")
       .update({
-        stripe_payment_intent_id: paymentIntent.charge.globalID,
+        payment_id: paymentIntent.charge.globalID,
         qr_code: paymentIntent.charge.qrCodeImage,
         pix_key: paymentIntent.charge.brCode,
         status: "pending",

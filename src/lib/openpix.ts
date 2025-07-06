@@ -50,3 +50,29 @@ export const createPartner = async (params: ICreatePartner) => {
     throw new Error(error.response?.data?.error || error.message)
   }
 }
+
+// export const createSubAccount = async (params: { pixKey: string, name: string }) => {
+//   try {
+//     const { data }: { data: { subAccount: { name: string, pixKey: string } } } = await http.post('/api/v1/subaccount', params)
+//     if (data) {
+//       return data
+//     }
+
+//     throw new Error("Response is void")
+//   } catch (error: any) {
+//     throw new Error(error.response?.data?.error || error.message)
+//   }
+// }
+
+export const withDrawSubAccount = async (pixKey: string) => {
+  try {
+    const { data }: { data: ICreatePartner } = await http.get(`/api/v1/subaccount/${pixKey}/withdraw`)
+    if (data) {
+      return data
+    }
+
+    throw new Error("Response is void")
+  } catch (error: any) {
+    throw new Error(error.response?.data?.error || error.message)
+  }
+}

@@ -23,8 +23,8 @@ import { ICreatePartner } from "@/types/openpix.interface"
 import { TaxTypeEnum } from "@/enums/tax-type.enum"
 
 interface StripeAccountData {
-  stripe_account_id?: string
-  stripe_account_status?: string
+  pix_key?: string
+  pix_status?: string
   stripe_onboarding_url?: string
   stripe_dashboard_url?: string
   stripe_account?: {
@@ -197,7 +197,7 @@ export default function StripePage() {
           <h1 className="text-3xl font-bold text-foreground">Configurações do Gateway de Pagamento</h1>
           <p className="text-muted-foreground">Gerencie sua conta para receber pagamentos PIX</p>
         </div>
-        {canCreateAccount && !stripeData.stripe_account_id && (
+        {canCreateAccount && !stripeData.pix_key && (
           <Dialog open={createAccountDialog} onOpenChange={setCreateAccountDialog}>
             <DialogTrigger asChild>
               <Button>
@@ -347,20 +347,20 @@ export default function StripePage() {
             Status da Conta
           </CardTitle>
           <CardDescription>
-            {stripeData.stripe_account_id
-              ? `ID da Conta: ${stripeData.stripe_account_id}`
+            {stripeData.pix_key
+              ? `ID da Conta: ${stripeData.pix_key}`
               : "Nenhuma conta configurada"}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {stripeData.stripe_account_id ? (
+          {stripeData.pix_key ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  {getStatusIcon(stripeData.stripe_account_status)}
+                  {getStatusIcon(stripeData.pix_status)}
                   <span className="font-medium">Status da Conta:</span>
-                  <Badge className={getStatusColor(stripeData.stripe_account_status)}>
-                    {getStatusText(stripeData.stripe_account_status)}
+                  <Badge className={getStatusColor(stripeData.pix_status)}>
+                    {getStatusText(stripeData.pix_status)}
                   </Badge>
                 </div>
               </div>
@@ -431,14 +431,14 @@ export default function StripePage() {
 
               {/* Ações */}
               <div className="flex space-x-2">
-                {stripeData.stripe_account_status !== "active" && (
+                {stripeData.pix_status !== "active" && (
                   <Button onClick={() => handleCreateLink("onboarding")} variant="outline">
                     Completar Onboarding
                     <ExternalLink className="ml-2 h-4 w-4" />
                   </Button>
                 )}
 
-                {stripeData.stripe_account_status === "active" && (
+                {stripeData.pix_status === "active" && (
                   <Button onClick={() => handleCreateLink("dashboard")} variant="outline">
                     <Settings className="mr-2 h-4 w-4" />
                     Acessar Dashboard

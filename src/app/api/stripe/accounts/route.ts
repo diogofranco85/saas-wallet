@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Verificar se já existe conta Stripe
-        if (company.stripe_account_id) {
+        if (company.pix_key) {
             return NextResponse.json({ error: "Stripe account already exists" }, { status: 400 })
         }
 
@@ -91,8 +91,8 @@ export async function POST(request: NextRequest) {
         const { error: updateError } = await supabase
             .from("companies")
             .update({
-                stripe_account_id: account.id,
-                stripe_account_status: "pending",
+                pix_key: account.id,
+                pix_status: "pending",
                 stripe_onboarding_url: accountLink.url,
             })
             .eq("id", user.company_id)
@@ -134,7 +134,7 @@ export async function GET() {
         // Buscar dados da empresa
         const { data: company } = await supabase
             .from("companies")
-            .select("stripe_account_id, stripe_account_status, stripe_onboarding_url, stripe_dashboard_url")
+            .select("pix_key, pix_status, stripe_onboarding_url, stripe_dashboard_url")
             .eq("id", user.company_id)
             .single()
 
@@ -143,15 +143,15 @@ export async function GET() {
         }
 
         let stripeAccount = null
-        if (company.stripe_account_id) {
+        if (company.pix_key) {
             try {
                 // Buscar dados atualizados da conta no Stripe
-                stripeAccount = await stripe.accounts.retrieve(company.stripe_account_id)
+                stripeAccount = await stripe.accounts.retrieve(company.pix_key)
 
                 // Atualizar status na base de dados se necessário
                 const newStatus = stripeAccount.charges_enabled ? "active" : "pending"
-                if (newStatus !== company.stripe_account_status) {
-                    await supabase.from("companies").update({ stripe_account_status: newStatus }).eq("id", user.company_id)
+                if (newStatus !== company.pix_status) {
+                    await supabase.from("companies").update({ pix_status: newStatus }).eq("id", user.company_id)
                 }
             } catch (stripeError) {
                 console.error("Error fetching Stripe account:", stripeError)
@@ -159,8 +159,8 @@ export async function GET() {
         }
 
         return NextResponse.json({
-            stripe_account_id: company.stripe_account_id,
-            stripe_account_status: company.stripe_account_status,
+            pix_key: company.pix_key,
+            pix_status: company.pix_status,
             stripe_onboarding_url: company.stripe_onboarding_url,
             stripe_dashboard_url: company.stripe_dashboard_url,
             stripe_account: stripeAccount

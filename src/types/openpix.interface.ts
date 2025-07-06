@@ -19,9 +19,15 @@ export interface ICreateBillingRequest {
     name: string;
     taxID: TaxTypeEnum;
     email?: string;
-    phone?: string
+    phone?: string;
   },
-  subaccount?: string //chave pix subsaccount
+  additionalInfo?: Record<string, string>[],
+  subaccount?: string
+  splits?: {
+    value: number
+    pixKey: string,
+    splitType: "SPLIT_SUB_ACCOUNT" | "SPLIT_INTERNAL_TRANSFER" | "SPLIT_PARTNER"
+  }[]
 }
 
 export interface ICreateBillingResponse {

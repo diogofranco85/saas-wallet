@@ -1,9 +1,8 @@
 -- Adicionar campos do Stripe nas tabelas existentes
-ALTER TABLE companies
-ADD COLUMN IF NOT EXISTS stripe_account_id VARCHAR(255);
+ALTER TABLE companies ADD COLUMN IF NOT EXISTS pix_key VARCHAR(255);
 
 ALTER TABLE companies
-ADD COLUMN IF NOT EXISTS stripe_account_status VARCHAR(50) DEFAULT 'pending';
+ADD COLUMN IF NOT EXISTS pix_status VARCHAR(50) DEFAULT 'pending';
 
 ALTER TABLE companies
 ADD COLUMN IF NOT EXISTS stripe_onboarding_url TEXT;
@@ -28,7 +27,7 @@ ALTER TABLE pix_charges
 ADD COLUMN IF NOT EXISTS net_amount DECIMAL(15, 2);
 
 -- Índices para performance
-CREATE INDEX IF NOT EXISTS idx_companies_stripe_account ON companies (stripe_account_id);
+CREATE INDEX IF NOT EXISTS idx_companies_stripe_account ON companies (pix_key);
 
 CREATE INDEX IF NOT EXISTS idx_pix_charges_stripe_payment_intent ON pix_charges (stripe_payment_intent_id);
 
