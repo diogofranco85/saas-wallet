@@ -58,7 +58,7 @@ export default function PaymentIdPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" >
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md m-2 lg:m-0">
         {charge && charge.status === "paid" && (
           <CustomCardPayment charge={charge}>
             <>

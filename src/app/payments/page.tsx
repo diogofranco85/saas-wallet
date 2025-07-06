@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowUpRightFromSquare } from "lucide-react";
+import { ArrowUpRightFromSquare, Home, QrCode } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -27,7 +28,7 @@ export default function PaymentsPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" >
-      <Card>
+      <Card className="m-2 lg:m-0">
         <CardHeader>
           <div className="flex  justify-center my-4">
             <p className="flex text-white text-3xl font-light">
@@ -44,12 +45,20 @@ export default function PaymentsPage() {
         <CardContent>
           <div className="flex flex-col items-center">
             <Label className="text-pink-600 mt-2 text-center text-sm" htmlFor="payment-code">Código de pagamento</Label>
-            <Input placeholder="Insira o código de pagamento" id="payment-code" className="text-2xl text-gray-900 mt-4 p-6" value={paymentCode} onChange={(e) => setPaymentCode(e.target.value)} />
+            <Input placeholder="Insira o código de pagamento" id="payment-code" className="text-sm lg:text-xl text-gray-900 mt-4 p-6" value={paymentCode} onChange={(e) => setPaymentCode(e.target.value)} />
 
             <div className="flex flex-col items-center mt-4">
               <Button className="w-full p-6 bg-pink-600 hover:bg-pink-700 text-white" disabled={!paymentCode} onClick={handlerOpenQRCode}>
+                <QrCode />
                 Visualizar QR-Code
               </Button>
+
+              <Link href="/" className="w-full">
+                <Button className="mt-2 w-full p-6 bg-teal-600 hover:bg-teal-700 text-white">
+                  <Home />
+                  Voltar para a home
+                </Button>
+              </Link>
               <p className="text-slate-500 mt-4 text-sm">Ou acesse o link de pagamento enviado para seu e-mail</p>
             </div>
           </div>
