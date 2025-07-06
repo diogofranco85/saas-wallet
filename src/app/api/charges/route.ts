@@ -188,14 +188,21 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit
 
     // Buscar usuário e empresa
-    const { data: user } = await supabase.from("users").select("company_id").eq("email", session.user.email).single()
+    const { data: user } = await supabase
+      .from("users")
+      .select("company_id")
+      .eq("email", session.user.email)
+      .single()
 
     if (!user?.company_id) {
       return NextResponse.json({ error: "Company not found" }, { status: 404 })
     }
 
     // Construir query
-    let query = supabase.from("pix_charges").select("*", { count: "exact" }).eq("company_id", user.company_id)
+    let query = supabase
+      .from("pix_charges")
+      .select("*", { count: "exact" })
+      .eq("company_id", user.company_id)
 
     // Aplicar filtros
     if (status && status !== "all") {

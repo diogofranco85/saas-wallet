@@ -1,3 +1,4 @@
+import { HttpException } from "@/helpers/http-exceptions";
 import { authOptions } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
 import { getServerSession } from "next-auth";
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get("sortOrder") || "desc"
 
     const offset = (page - 1) * limit
+    const to = offset + limit - 1
 
     const supabase = createServerClient()
 
@@ -38,13 +40,12 @@ export async function GET(request: NextRequest) {
       query = query.or(`title.ilike.%${search}%,message.ilike.%${search}%`)
     }
 
-    const { data: notifications, error: notificationsError, count } = await query.order(sortBy, { ascending: sortOrder === "asc" })
+    query = query.order(sortBy, { ascending: sortOrder === "asc" }).range(offset, to)
 
-
-    // const { data: notifications, error: notificationsError, count  } = await query.range(offset, offset * limit - 1)
+    const { data: notifications, error: notificationsError, count, status } = await query
 
     if (notificationsError) {
-      throw notificationsError;
+      throw new HttpException(status, notificationsError.message);
     }
 
     return NextResponse.json({
@@ -59,7 +60,10 @@ export async function GET(request: NextRequest) {
 
 
   } catch (error: any) {
-    console.error("Error creating company:", error)
+
+    if (error instanceof HttpException) {
+      return NextResponse.json({ error: error.message }, { status: error.status })
+    }
     return NextResponse.json({ error: "Internal server error", message: error.message }, { status: 500 })
   }
 }

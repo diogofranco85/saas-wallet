@@ -1,13 +1,15 @@
 "use client"
+import { CustomLoading } from "@/components/loading"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { TableBody, TableCell, TableHead, TableHeader, TableRow, Table } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { formatDate } from "@/helpers/formatDate"
-import { ArrowUpDown, ChevronLeft, ChevronRight, Eye, Search, X, } from "lucide-react"
-import Link from "next/link"
+import { DialogTitle } from "@radix-ui/react-dialog"
+import { ArrowUpDown, ChevronLeft, ChevronRight, Eye, EyeClosed, Search, X } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
@@ -39,10 +41,13 @@ export default function NotificationPage() {
     total: 0,
     totalPages: 0,
   })
+  const [dialogDialogOpen, setDialogDialogOpen] = useState<boolean>(false)
+  const [uniqueNotification, setUniqueNotification] = useState<INotifications | null>(null)
 
   const [notifications, setNotifications] = useState<INotifications[]>([])
 
   const [loading, setLoading] = useState<boolean>(false)
+  const [loadingUniqueNotification, setLoadingUniqueNotification] = useState<boolean>(false)
 
   useEffect(() => {
     fetchNotifications()
@@ -69,6 +74,24 @@ export default function NotificationPage() {
       console.error("Error fetching charges:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchUniqueNotification = async (id: string) => {
+    setLoadingUniqueNotification(true)
+    try {
+      const response = await fetch(`/api/notifications/${id}`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch notification")
+      }
+      const data = await response.json()
+      setUniqueNotification(data.notifications)
+      setDialogDialogOpen(true)
+    } catch (error) {
+      console.error("Error fetching unique notification:", error)
+      toast.error("Erro ao buscar notificação")
+    } finally {
+      setLoadingUniqueNotification(false)
     }
   }
 
@@ -215,12 +238,10 @@ export default function NotificationPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
-                            <Link href={`/dashboard/notifications/${notification.id}`}>
-                              <Button size="sm" variant="outline">
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </Link>
 
+                            <Button size="sm" variant="outline" onClick={() => fetchUniqueNotification(notification.id)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
 
                             <Button size="sm" variant="outline" onClick={() => handlerExcludeNotification(notification.id)}>
                               <X className="h-4 w-4" />
@@ -267,6 +288,54 @@ export default function NotificationPage() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={dialogDialogOpen} onOpenChange={() => setDialogDialogOpen(!dialogDialogOpen)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2 font-semibold text-2xl">
+              <p className="text-pink-700 text-xl">{uniqueNotification?.title}</p>
+            </DialogTitle>
+
+          </DialogHeader>
+          {loadingUniqueNotification ?? <CustomLoading text="Carregando notificação..." />}
+
+          {uniqueNotification && <div>
+            <p>{uniqueNotification?.message}</p>
+            <div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={() => {
+                  setDialogDialogOpen(false)
+                  setUniqueNotification(null)
+                }}
+              >
+                <div className="flex items-center">
+                  <X className="h-4 w-4 mr-2" />
+                  Fechar
+                </div>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-4 mt-4 bg-yellow-200 hover:bg-yellow-300"
+                onClick={() => {
+                  handlerExcludeNotification(uniqueNotification.id)
+                  setDialogDialogOpen(false)
+                  setUniqueNotification(null)
+                }}
+              >
+                <div className="flex items-center">
+                  <EyeClosed className="h-4 w-4 mr-2" />
+                  Marcar como visualizada
+                </div>
+              </Button>
+            </div>
+          </div>}
+
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

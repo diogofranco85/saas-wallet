@@ -1,3 +1,4 @@
+import { HttpException } from "@/helpers/http-exceptions";
 import { authOptions } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
 import { getServerSession } from "next-auth";
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<IP
 
     const supabase = createServerClient()
 
-    const { data: notifications, error: notificationsError } = await supabase
+    const { data: notifications, error: notificationsError, status } = await supabase
       .from("notifications")
       .select()
       .eq("user_id", session.user.id)
@@ -27,13 +28,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<IP
       .single();
 
     if (notificationsError) {
-      throw notificationsError;
+      throw new HttpException(status, notificationsError.message);
     }
 
     return NextResponse.json({ notifications })
 
   } catch (error: any) {
-    console.error("Error creating company:", error)
+    if (error instanceof HttpException) {
+      return NextResponse.json({ error: error.message }, { status: error.status })
+    }
+
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

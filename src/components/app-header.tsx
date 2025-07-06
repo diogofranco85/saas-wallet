@@ -140,7 +140,12 @@ export function AppHeader() {
           <DropdownMenuContent align="end" className="w-80">
             <DropdownMenuLabel>Notificações</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {messages.map((message) => {
+            {messages.length === 0 && (
+              <DropdownMenuItem className="flex items-center justify-center text-center">
+                <span className="text-red-400">Nenhuma nova notificação</span>
+              </DropdownMenuItem>
+            )}
+            {messages.length !== 0 && messages.map((message) => {
               return (
                 <DropdownMenuItem key={message.id}>
                   <div className="flex flex-col space-y-1">

@@ -358,7 +358,7 @@ export default function TeamPage() {
               </Button>
             </Link>
             {canInvite && (
-              <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+              <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen} >
                 <DialogTrigger asChild>
                   <Button className="bg-pink-600 hover:bg-pink-700">
                     <UserPlus className="mr-2 h-4 w-4 " />
