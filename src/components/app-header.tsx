@@ -82,7 +82,19 @@ export function AppHeader() {
           filter: `user_id=eq.${session?.user.id}`
         },
         (payload) => {
-          console.log('Change received!', payload)
+          if (payload.eventType === 'INSERT') {
+            const newNotification = payload.new as INotifications
+            setMessages((prev) => [...prev, newNotification])
+            toast.success("Notificação", { description: newNotification.message })
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedNotification = payload.new as INotifications
+            setMessages((prev) =>
+              prev.map((msg) => (msg.id === updatedNotification.id ? updatedNotification : msg))
+            )
+          } else if (payload.eventType === 'DELETE') {
+            const deletedNotification = payload.old as INotifications
+            setMessages((prev) => prev.filter((msg) => msg.id !== deletedNotification.id))
+          }
         }
       )
       .subscribe()
