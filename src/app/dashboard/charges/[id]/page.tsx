@@ -43,7 +43,7 @@ interface ChargeDetails {
   expires_at: string
   paid_at?: string
   created_at: string
-  stripe_payment_intent_id?: string
+  payment_id?: string
 }
 
 interface ChargeHistory {
