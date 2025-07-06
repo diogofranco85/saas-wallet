@@ -91,8 +91,8 @@ export async function POST(request: NextRequest) {
         payer_document: data.payerDocument,
         payer_email: data.payerEmail,
         expires_at: expiresAt.toISOString(),
-        fee_amount: feeAmount, // Converter de volta para reais
-        net_amount: netAmount,
+        fee_amount: feeAmount / 100, // Converter de volta para reais
+        net_amount: netAmount / 100,
         status: "created",
       })
       .select()
