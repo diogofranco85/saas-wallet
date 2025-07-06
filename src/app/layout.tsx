@@ -4,7 +4,7 @@ import type React from "react"
 import "./globals.css"
 import { Providers } from "./provider"
 import { cn } from "@/lib/utils"
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "sonner";
 
 const font = DM_Sans({ subsets: ["latin"] })
 
@@ -23,12 +23,7 @@ export default function RootLayout({
       <body className={cn(font.className, 'bg-gray-800')}>
         <Providers>
           {children}
-          <Toaster position="top-right" toastOptions={{
-            style: {
-              background: "#1f2937",
-              color: "#be185d"
-            }
-          }} />
+          <Toaster position="top-right" />
         </Providers>
       </body>
     </html>

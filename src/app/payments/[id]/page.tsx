@@ -1,34 +1,19 @@
 "use client";
+import { CustomCardPayment } from "@/components/custom-card-payment";
 import { CustomLoading } from "@/components/loading";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { formatCurrency } from "@/helpers/formatCurrency";
+import { Button } from "@/components/ui/button";
 import { formatDate } from "@/helpers/formatDate";
-import { getStatusMap } from "@/helpers/getStatusMap";
-import { ArrowUpRightFromSquare, CheckCircle2Icon } from "lucide-react";
+import { IChargeDetails } from "@/types/charge.interface";
+import { CheckCircle2Icon, CircleX, Clock } from "lucide-react";
 import Image from "next/image";
-import { useParams, usePathname } from "next/navigation";
-import { use, useEffect, useState } from "react";
-
-
-interface ChargeDetails {
-  id: string
-  amount: number
-  description: string
-  status: string
-  payer_name?: string
-  payer_email?: string
-  payer_document?: string
-  pix_key?: string
-  qr_code?: string
-  expires_at: string
-  paid_at?: string
-  created_at: string
-  payment_id?: string
-}
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast, Toaster } from "sonner";
 
 export default function PaymentIdPage() {
 
-  const [charge, setCharge] = useState<ChargeDetails | null>(null);
+  const [charge, setCharge] = useState<IChargeDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   const params = useParams(); // Replace with actual payment ID from route params or context
@@ -58,80 +43,107 @@ export default function PaymentIdPage() {
     return expireDate < new Date();
   }
 
+  const handlerCopyPixKey = async (pixKey: string) => {
+    navigator.clipboard.writeText(pixKey)
+    toast.success("Chave Pix copiada com sucesso!", { description: "Agora você pode colar em seu aplicativo bancário." })
+  }
+
+  const handlerPrint = () => {
+    window.print();
+  }
+
   if (loading) {
     return <CustomLoading text="Carregando detalhes do pagamento..." />
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen " >
-      <div className="flex  justify-center my-1">
-        <p className="flex text-white text-3xl font-light">
-          <ArrowUpRightFromSquare className="mr-3 text-pink-600" size={36} />
-          Hypepay
-        </p>
-      </div>
-      <div className="flex flex-col items-center mt-2 w-300">
+    <div className="min-h-screen flex items-center justify-center" >
+      <div className="w-full max-w-md">
         {charge && charge.status === "paid" && (
-          <Alert className="w-1/2 bg-green-100 text-green-800 mt-3">
-            <CheckCircle2Icon />
-            <AlertTitle className="text-2xl">Pagamento realizado</AlertTitle>
-            <AlertDescription className="text-lg">
-              Esse QR-Code foi pago com sucesso.
-              {charge.paid_at && (
-                <p><strong>Paid At:</strong> {formatDate(charge.paid_at)}</p>
-              )}
-            </AlertDescription>
-          </Alert>
+          <CustomCardPayment charge={charge}>
+            <>
+              <Alert className="bg-green-100 text-green-800 mt-3  flex items-center">
+                <div className="w-1/6 flex items-center justify-center">
+                  <CheckCircle2Icon />
+                </div>
+                <div className="py-4">
+                  <AlertTitle className="text-xl">Pagamento realizado</AlertTitle>
+                  <AlertDescription className="text-sm my-3">
+                    O pagamento foi realizado e processado com sucesso.
+                  </AlertDescription>
+                  {charge.paid_at && (
+                    <p><strong>Pago em:</strong> {formatDate(charge.paid_at)}</p>
+                  )}
+                </div>
+              </Alert>
+              <div className="text-sm m-2 text-center">
+                <p><strong>Confirmação de pagamento</strong></p>
+                <p>{charge.endtoend}</p>
+              </div>
+
+              <Button
+                variant="outline"
+                className="mt-2 p-4 w-full bg-green-600 text-white hover:bg-green-700 hover:text-white"
+                onClick={() => handlerPrint()}
+              >Imprimir comprovante</Button>
+            </>
+          </CustomCardPayment>
         )}
 
         {charge && isExpired(charge.expires_at) && charge.status === 'pending' && (
-          <Alert className="w-1/2 bg-yellow-100 text-green-800 mt-3">
-            <CheckCircle2Icon />
-            <AlertTitle className="text-2xl">Pagamento expirado</AlertTitle>
-            <AlertDescription className="text-lg">
-              Esse QR-Code ja foi está expirado, por favor peça ao fornecedor para criar uma nova cobrança.
-            </AlertDescription>
-          </Alert>
+          <CustomCardPayment charge={charge}>
+            <Alert className=" bg-yellow-100 text-yellow-800 mt-3 flex items-center">
+              <div className="w-2/6 flex items-center justify-center">
+                <Clock />
+              </div>
+              <div className="py-4">
+                <AlertTitle className="text-xl">Pagamento expirado</AlertTitle>
+                <AlertDescription className="text-sm">
+                  Esse QR-Code ja foi está expirado, por favor peça ao fornecedor para criar uma nova cobrança.
+                </AlertDescription>
+              </div>
+            </Alert>
+          </CustomCardPayment>
         )}
 
         {charge && charge.status === 'cancelled' && (
-          <Alert className="w-1/2 bg-red-100 text-green-800 mt-3">
-            <CheckCircle2Icon />
-            <AlertTitle className="text-2xl">Pagamento cancelada</AlertTitle>
-            <AlertDescription className="text-lg">
-              Esse QR-Code foi cancelado pela fornecedor, por favor peça ao fornecedor para criar uma nova cobrança.
-            </AlertDescription>
-          </Alert>
+          <CustomCardPayment charge={charge}>
+            <Alert className="bg-red-100 text-red-800 mt-3 flex items-center">
+              <div className="w-2/6 flex items-center justify-center">
+                <CircleX />
+              </div>
+              <div className="py-4">
+                <AlertTitle className="text-xl">Pagamento cancelada</AlertTitle>
+                <AlertDescription className="text-sm">
+                  Esse QR-Code foi cancelado pela fornecedor, por favor peça ao fornecedor para criar uma nova cobrança.
+                </AlertDescription>
+              </div>
+            </Alert>
+          </CustomCardPayment>
         )}
 
         {charge && !isExpired(charge.expires_at) && charge.status === 'pending' && (
-          <div className="border border-pink-600 p-6 rounded-lg w-full bg-white text-gray-600">
-            <h2 className="text-2xl font-bold mb-4 text-pink-600 text-center">Detalhes do Pagamento</h2>
-            <p className="border p-2 m-1"><strong>ID:</strong> {charge.id}</p>
-            <p className="border p-2 m-1"><strong>Valor:</strong> {formatCurrency(charge.amount)}</p>
-            <p className="border p-2 m-1"><strong>Situação:</strong> Pagamento {getStatusMap(charge.status)}</p>
-            <p className="border p-2 m-1"><strong>Descrição:</strong> {charge.description}</p>
-            {charge.payer_name && <div className="border p-2 m-1 mt-4 bg-gray-500 text-white">
-              <p>
-                <strong>Pagador: </strong>
-                {charge.payer_name}
-                <br />
-                <strong> Documento: </strong>
-                {charge.payer_document}
-              </p>
-            </div>}
+          <CustomCardPayment charge={charge}>
             <div className="flex flex-col items-center mt-4">
               {charge.pix_key &&
-                <p className="border border-pink-600 p-2 m-1 w-full text-center">
-                  <strong>Pix copia e cola:</strong>
-                  <br />
-                  <code className="p-3 text-sm break-all">{charge.pix_key}</code>
-                </p>}
+                <div>
+                  <p className="border border-pink-600 p-2 m-1 w-full text-center">
+                    <strong>Pix copia e cola:</strong>
+                    <br />
+                    <code className="p-3 text-sm break-all">{charge.pix_key}</code>
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-2 p-4 w-full bg-pink-600 text-white hover:bg-pink-700"
+                    onClick={() => handlerCopyPixKey(String(charge.pix_key))}
+                  >Copiar</Button>
+                </div>}
+
             </div>
             <div className="flex flex-col items-center">
               {charge.qr_code && (
                 <div className="mt-1">
-                  <Image src={charge.qr_code} alt="QR Code" height={300} width={300} />
+                  <Image src={charge.qr_code} alt="QR Code" height={200} width={200} />
                 </div>
               )}
               <p><strong>Expira em:</strong> {formatDate(charge.expires_at)}</p>
@@ -139,9 +151,9 @@ export default function PaymentIdPage() {
             {charge.paid_at && (
               <p><strong>Pago em:</strong> {formatDate(charge.paid_at)}</p>
             )}
-          </div>
+          </CustomCardPayment>
         )}
       </div>
-    </div>
+    </div >
   )
 }

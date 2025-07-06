@@ -12,7 +12,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const { data: charge, error } = await supabase
       .from("pix_charges")
-      .select("id, amount, description, status, payer_name, payer_email, payer_document, pix_key, qr_code, expires_at, paid_at, created_at")
+      .select(`
+        id, 
+        amount, 
+        description, 
+        status, 
+        payer_name, 
+        payer_email, 
+        payer_document, 
+        pix_key, qr_code, 
+        expires_at, 
+        paid_at, 
+        created_at, 
+        endtoend,
+        companies(id, name)`)
       .eq("id", chargeId)
       .single()
 
