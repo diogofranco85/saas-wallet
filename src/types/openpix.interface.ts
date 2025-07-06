@@ -28,6 +28,7 @@ export interface ICreateBillingRequest {
     pixKey: string,
     splitType: "SPLIT_SUB_ACCOUNT" | "SPLIT_INTERNAL_TRANSFER" | "SPLIT_PARTNER"
   }[]
+  expiresIn?: number // Em segundos, padrão 60 * 15 (15 minutos)
 }
 
 export interface ICreateBillingResponse {

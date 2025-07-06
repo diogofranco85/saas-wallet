@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { createServerClient } from "@/lib/supabase"
 import { createBilling } from "@/lib/openpix"
-import { TaxTypeEnum } from "@/enums/tax-type.enum"
 import { formatDocument } from "@/helpers/formatDocument"
 
 export async function POST(request: NextRequest) {
@@ -133,7 +132,8 @@ export async function POST(request: NextRequest) {
           pixKey: company.pix_key || "",
           splitType: "SPLIT_SUB_ACCOUNT"
         }
-      ]
+      ],
+      expiresIn: 60 * 15, // Expira em 15 minutos
     })
 
     await supabase.from("pix_charges")

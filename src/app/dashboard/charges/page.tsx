@@ -158,8 +158,8 @@ export default function ChargesPage() {
     <CustomContainer>
       {/* Header */}
       <PageHeader
-        title="Equipes - Convites"
-        description="Visão geral do seus convites recentes"
+        title="Cobranças"
+        description="Visão geral das cobranças mais recentes"
         action={
           <Link href="/dashboard/charges/new">
             <Button className="bg-pink-700 hover:bg-pink-800">
@@ -169,8 +169,8 @@ export default function ChargesPage() {
           </Link>
         }
         breadcrumbs={[
-          { title: "Equipes", href: "/dashboard/team" },
-          { title: "Convites" }
+          { title: "Dashboard", href: "/dashboard" },
+          { title: "Lista de cobranças" }
         ]}
       />
 
