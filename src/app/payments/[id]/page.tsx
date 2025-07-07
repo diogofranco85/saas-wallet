@@ -3,9 +3,10 @@ import { CustomCardPayment } from "@/components/custom-card-payment";
 import { CustomLoading } from "@/components/loading";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
 import { formatDate } from "@/helpers/formatDate";
 import { IChargeDetails } from "@/types/charge.interface";
-import { CheckCircle2Icon, CircleX, Clock } from "lucide-react";
+import { ArrowUpRightFromSquare, Ban, CheckCircle2Icon, CircleX, Clock, CloudAlert } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -54,6 +55,36 @@ export default function PaymentIdPage() {
 
   if (loading) {
     return <CustomLoading text="Carregando detalhes do pagamento..." />
+  }
+
+  if (!charge && !loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" >
+        <Card >
+          <CardHeader>
+            <div className="flex justify-center">
+              <p className="flex text-gray-700 text-3xl font-light">
+                <ArrowUpRightFromSquare className="mr-3 text-pink-600" size={36} />
+                HypePay
+              </p>
+            </div>
+            <CardDescription>
+
+              <p className="text-center text-xl">Error ao consultar QR - Code</p>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col justify-center items-center">
+            <CloudAlert className="text-red-500" size={100} />
+            <p className="text-center text-lg">O código informando não e válido</p>
+            <p>Não conseguimos encontrar na base de dados o código informado</p>
+            <p>Verifique com seu fornecedor ou peça para criar uma nova cobrança</p>
+          </CardContent>
+          <CardFooter className="flex flex-col items-center">
+            <p className="text-center text-slate-400">Pagamento processado por HypePay</p>
+          </CardFooter>
+        </Card>
+      </div>
+    )
   }
 
   return (

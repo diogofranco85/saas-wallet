@@ -8,6 +8,8 @@ import { ArrowUpRightFromSquare, Home, QrCode } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
+import { validate as isUuid } from 'uuid'
 
 
 export default function PaymentsPage() {
@@ -22,6 +24,12 @@ export default function PaymentsPage() {
       return;
     }
 
+    const isValidPaymentCode = isUuid(paymentCode);
+
+    if (!isValidPaymentCode) {
+      toast.error("Código de pagamento inválido", { description: "O código de pagamento informado é invalido, verifique e tente novamente" })
+      return;
+    }
     const href = `/payments/${paymentCode}`
     router.push(href);
   }
