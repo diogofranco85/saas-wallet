@@ -3,7 +3,7 @@ import { CustomCard } from "@/components/custom-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/helpers/formatCurrency"
-import { ArrowRight, ArrowUpRightFromSquare, BarChart3, Shield, Users, Zap } from "lucide-react"
+import { ArrowRight, ArrowUpRightFromSquare, BarChart3, QrCode, Shield, UserRound, Users, Zap } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -73,10 +73,16 @@ export default function LandingPage() {
           </div>
           <div className="space-x-4 mt-3">
             <Link href="/auth/signin" className="w-20">
-              <Button variant="outline">Entrar</Button>
+              <Button variant="outline">
+                <UserRound />
+                Entrar / Criar conta
+              </Button>
             </Link>
-            <Link href="/auth/signin" className="w-100">
-              <Button className="bg-pink-500 hover:bg-pink-700">Começar Grátis</Button>
+            <Link href="/payments" className="w-100">
+              <Button className="bg-pink-500 hover:bg-pink-700">
+                <QrCode />
+                Consultar QR Code
+              </Button>
             </Link>
           </div>
         </nav>
