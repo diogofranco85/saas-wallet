@@ -1,54 +1,86 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { CustomContainer } from "@/components/custom-container"
+import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { useRouter } from "next/navigation"
+import { formatDocument } from "@/helpers/formatDocument"
 import { ArrowLeft, BadgeXIcon } from "lucide-react"
 import Link from "next/link"
-import { PageHeader } from "@/components/page-header"
-import { CustomContainer } from "@/components/custom-container"
-import MoneyInput from "@/components/custom-money-input"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { Controller, useForm } from "react-hook-form"
+import { toast } from "sonner"
+
+interface IPostData {
+  amount: number,
+  description: string,
+  payerName: string,
+  payerDocument: string,
+  payerEmail: string,
+  displayAmount: string
+}
 
 export default function NewCharge() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    amount: "",
-    description: "",
-    payerName: "",
-    payerDocument: "",
-    payerEmail: "",
+  const { control, handleSubmit, setValue } = useForm<IPostData>({
+    defaultValues: {
+      amount: 0,
+      description: "",
+      payerName: "",
+      payerDocument: "",
+      payerEmail: "",
+      displayAmount: "R$ 0,00"
+    }
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (postData: IPostData) => {
     setLoading(true)
 
     try {
+
+      if (postData.amount < 4.99) {
+        toast.error("Valor mínimo", { description: "O Valor da cobrança não pode ser menor que R$ 5,00" })
+        return;
+      }
       const response = await fetch("/api/charges", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          amount: Number.parseFloat(formData.amount),
+          ...postData,
+          payerDocument: postData.payerDocument.replace(/\D/g, "")
         }),
       })
 
       if (response.ok) {
         const data = await response.json()
+        toast("Cobrança criada com sucesso!")
         router.push(`/dashboard/charges/${data.charge.id}`)
       }
-    } catch (error) {
-      console.error("Error creating charge:", error)
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Erro ao criar cobrança PIX", { description: error.message })
     } finally {
       setLoading(false)
     }
+  }
+
+  const formatCurrency = (value: string) => {
+    const onlyNumbers = value.replace(/\D/g, "")
+    const numeric = parseFloat(onlyNumbers) / 100
+    return numeric.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    })
+  }
+
+  const parseCurrency = (formatted: string): number => {
+    const onlyNumbers = formatted.replace(/\D/g, "")
+    return Number(onlyNumbers) / 100
   }
 
   return (
@@ -86,66 +118,112 @@ export default function NewCharge() {
               <CardDescription>Preencha os dados para gerar uma nova cobrança PIX</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="amount" className="mb-2">Valor (R$)</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      min="0.01"
-                      value={formData.amount}
-                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                      placeholder="0,00"
-                      required
+                    <Controller
+                      name="amount"
+                      control={control}
+                      render={({ field }) => <input type="hidden" {...field} />}
+                    />
+
+                    <Controller
+                      name="displayAmount"
+                      control={control}
+                      render={({ field }) => (
+                        <>
+                          <Label htmlFor="displayAmount" className="mb-2">Valor (R$)</Label>
+                          <Input
+                            {...field}
+                            inputMode="numeric"
+                            onChange={(e) => {
+                              const formatted = formatCurrency(e.target.value)
+                              field.onChange(formatted)
+                              setValue("amount", parseCurrency(formatted))
+                            }}
+                            placeholder="R$ 0,00"
+                            required
+                          />
+                        </>
+                      )}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="description" className="mb-2">Descrição</Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Descreva o motivo da cobrança"
-                    required
+                  <Controller
+                    name="description"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <Label htmlFor="description" className="mb-2">Descrição</Label>
+                        <Textarea
+                          {...field}
+                          placeholder="Descreva o motivo da cobrança"
+                          required
+                        />
+                      </>
+                    )}
                   />
                 </div>
 
-
                 <div>
-                  <Label htmlFor="payerName" className="mb-2">Nome do Pagador</Label>
-                  <Input
-                    id="payerName"
-                    value={formData.payerName}
-                    onChange={(e) => setFormData({ ...formData, payerName: e.target.value })}
-                    placeholder="Nome completo"
+                  <Controller
+                    name="payerName"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <Label htmlFor="payerName" className="mb-2">Nome do Pagador</Label>
+                        <Input
+                          {...field}
+                          id="payerName"
+                          placeholder="Nome completo"
+                        />
+                      </>
+                    )}
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="payerDocument" className="mb-2">CPF/CNPJ do Pagador</Label>
-                    <Input
-                      id="payerDocument"
-                      value={formData.payerDocument}
-                      onChange={(e) => setFormData({ ...formData, payerDocument: e.target.value })}
-                      placeholder="000.000.000-00"
+                    <Controller
+                      name="payerDocument"
+                      control={control}
+                      render={({ field }) => (
+                        <>
+                          <Label htmlFor="payerDocument" className="mb-2">CPF/CNPJ do Pagador</Label>
+                          <Input
+                            {...field}
+                            id="payerDocument"
+                            placeholder="000.000.000-00"
+                            onChange={(e) => {
+                              const formatted = formatDocument(e.target.value)
+                              field.onChange(formatted)
+                            }}
+                          />
+                        </>
+                      )}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="payerEmail" className="mb-2">Email do Pagador</Label>
-                  <Input
-                    id="payerEmail"
-                    type="email"
-                    value={formData.payerEmail}
-                    onChange={(e) => setFormData({ ...formData, payerEmail: e.target.value })}
-                    placeholder="email@exemplo.com"
+                  <Controller
+                    name="payerEmail"
+                    control={control}
+                    render={({ field }) => (
+                      <>
+                        <Label htmlFor="payerEmail" className="mb-2">Email do Pagador</Label>
+                        <Input
+                          {...field}
+                          id="payerEmail"
+                          type="email"
+                          placeholder="email@exemplo.com"
+                        />
+                      </>
+                    )}
                   />
+
                 </div>
 
                 <div className="flex space-x-4">

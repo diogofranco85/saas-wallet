@@ -4,6 +4,9 @@ import { authOptions } from "@/lib/auth"
 import { createServerClient } from "@/lib/supabase"
 import { createBilling } from "@/lib/openpix"
 import { formatDocument } from "@/helpers/formatDocument"
+import { resend } from "@/lib/resend"
+import { EmailTemplateCreateCharge } from "@/components/email/charge/create"
+import { maskDocument } from "@/helpers/maskDocument"
 
 export async function POST(request: NextRequest) {
   let chargeId;
@@ -11,13 +14,13 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
     const data = await request.json()
 
-    if (data.amount <= 5.00) {
-      return NextResponse.json({ error: "Amount must be greater than 5 Reais" }, { status: 400 })
+    if (data.amount <= 4.99) {
+      return NextResponse.json({ message: "O valor da cobrança não pode ser menor que R$ 5,00" }, { status: 400 })
     }
 
     // Buscar usuário e empresa
@@ -28,7 +31,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (!user?.company_id) {
-      return NextResponse.json({ error: "Company not found" }, { status: 404 })
+      return NextResponse.json({ message: "Empresão não foi localizada" }, { status: 404 })
     }
 
     // Buscar dados da empresa e plano
@@ -45,29 +48,18 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (!company) {
-      return NextResponse.json({ error: "Company not found" }, { status: 404 })
+      return NextResponse.json({ message: "Empresão não foi localizadad" }, { status: 404 })
     }
 
     // Verificar se a empresa tem conta Stripe ativa
     if (!company.pix_key) {
       return NextResponse.json(
         {
-          error: "gateway account not configured. Please complete onboarding first.",
+          error: "Você nao possui uma chave PIX cadastrada. Por favor, cadastre uma chave PIX na sua conta.",
         },
         { status: 400 },
       )
     }
-
-    // Verificar status da conta Stripe
-    // const stripeAccount = await stripe.accounts.retrieve(company.pix_key)
-    // if (!stripeAccount.charges_enabled) {
-    //   return NextResponse.json(
-    //     {
-    //       error: "Stripe account not ready to accept charges. Please complete onboarding.",
-    //     },
-    //     { status: 400 },
-    //   )
-    // }
 
     // Calcular valores
     const grossAmount = Math.round(data.amount * 100) // Converter para centavos
@@ -145,12 +137,42 @@ export async function POST(request: NextRequest) {
       })
       .eq("id", charge.id)
 
+    const { data: resendData, error: resendError } = await resend.emails.send({
+      from: "no-replay@hypepay.com.br",
+      to: [data.payerEmail],
+      subject: `Cobrança PIX - ${company.name}`,
+      react: EmailTemplateCreateCharge({
+        charge: {
+          ...charge,
+          payer_document: maskDocument(data.payerDocument),
+          pix_key: paymentIntent.charge.brCode,
+          qr_code: paymentIntent.charge.qrCodeImage,
+          expires_at: expiresAt.toISOString(),
+          companies: {
+            name: company.name,
+            document: company.document,
+          }
+        }
+      })
+    })
+
+    if (resendError) {
+      console.error("Error sending email:", resendError.message)
+      // Não falhar a criação da cobrança se o envio de e-mail falhar
+    }
+
+    console.log("Email sent successfully:", resendData)
+
     return NextResponse.json({
       success: true,
       charge: {
-        ...charge,
+        ...charge, companies: {
+          name: company.name,
+          document: company.document,
+        }
       },
     })
+
   } catch (error) {
     console.error("Error creating charge:", error)
     await supabase.from("pix_charges")
@@ -161,7 +183,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Internal server error",
+        message: error instanceof Error ? error.message : "Internal server error",
       },
       { status: 500 },
     )
@@ -173,7 +195,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
     }
 
     const supabase = createServerClient()
