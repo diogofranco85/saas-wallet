@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
       .eq("id", charge.id)
 
     const { error: resendError } = await resend.emails.send({
-      from: "no-replay@hypepay.com.br",
+      from: process.env.RESEND_EMAIL_FROM as string,
       to: [data.payerEmail],
       subject: `Cobrança PIX - ${company.name}`,
       react: EmailTemplateCreateCharge({

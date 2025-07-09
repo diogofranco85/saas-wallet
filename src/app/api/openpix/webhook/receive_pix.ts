@@ -104,7 +104,7 @@ export async function receivedPixWebhook(body: any, header: string) {
     }
 
     const { error: resendError } = await resend.emails.send({
-      from: "no-replay@hypepay.com.br",
+      from: process.env.RESEND_EMAIL_FROM as string,
       to: [pixChargeMoviment.payerEmail],
       subject: `Pagamento Realizado | Cobrança PIX - ${pixChargeMoviment.companies.name}`,
       react: EmailTemplatePayCharge({
