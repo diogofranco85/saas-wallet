@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       {
         message: "Event not handled",
       },
-      { status: 200 },
+      { status: 200 })
 
     const body = await request.json()
     const header = request.headers.get("X-OpenPix-Signature");
