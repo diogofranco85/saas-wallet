@@ -24,9 +24,9 @@ export async function receivedPixWebhook(body: any, header: string) {
 
     const isValidSignature = validateHmac(header, body, webhookData.hmac);
 
-    // if (!isValidSignature) {
-    //   throw new HttpException(403, "Invalid signature webhook");
-    // }
+    if (!isValidSignature) {
+      throw new HttpException(403, "Invalid signature webhook");
+    }
 
     const { data: pixChargeMoviment, error: pixChargeError } = await supabase
       .from("pix_charges")
