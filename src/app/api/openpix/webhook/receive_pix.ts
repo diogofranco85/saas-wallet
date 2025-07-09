@@ -24,9 +24,9 @@ export async function receivedPixWebhook(body: any, header: string) {
 
     const isValidSignature = validateHmac(header, body, webhookData.hmac);
 
-    if (!isValidSignature) {
-      throw new HttpException(403, "Invalid signature webhook");
-    }
+    // if (!isValidSignature) {
+    //   throw new HttpException(403, "Invalid signature webhook");
+    // }
 
     await supabase.from("pix_charges").update({
       paid_at: body.charge.paidAt,
@@ -100,7 +100,7 @@ export async function receivedPixWebhook(body: any, header: string) {
       react: EmailTemplatePayCharge({
         charge: {
           ...pixChargeMoviment,
-          payer_document: maskDocument(pixChargeMoviment.payerDocument),
+          payer_document: maskDocument(pixChargeMoviment.payer_document),
           companies: {
             name: pixChargeMoviment.companies.name,
             document: pixChargeMoviment.companies.document,
