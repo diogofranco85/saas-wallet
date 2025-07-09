@@ -3,6 +3,9 @@ import { HttpException } from "@/helpers/http-exceptions";
 import { validateHmac } from "@/helpers/validate-hmac";
 import { createServerClient } from "@/lib/supabase";
 import { statusParser } from "./status_parse";
+import { resend } from "@/lib/resend";
+import { EmailTemplatePayCharge } from "@/components/email/charge/pay";
+import { maskDocument } from "@/helpers/maskDocument";
 
 export async function receivedPixWebhook(body: any, header: string) {
   try {
@@ -34,7 +37,7 @@ export async function receivedPixWebhook(body: any, header: string) {
 
     const { data: pixChargeMoviment, error: pixChargeError } = await supabase
       .from("pix_charges")
-      .select("id, amount, company_id, net_amount, created_by, payer_name")
+      .select("*, companies(*)")
       .eq("id", body.charge.correlationID)
       .single()
 
@@ -53,7 +56,6 @@ export async function receivedPixWebhook(body: any, header: string) {
 
     const title = 'Pagamento recebido com sucesso!'
     const message = `Pagamento recebido no valor de ${formatCurrency(pixChargeMoviment.amount)} de ${pixChargeMoviment.payer_name} com sucesso!`
-
 
 
     const { data: usersData, error: usersError } = await supabase
@@ -89,6 +91,26 @@ export async function receivedPixWebhook(body: any, header: string) {
       if (insertError) {
         throw new HttpException(400, "Error inserting notifications");
       }
+    }
+
+    const { error: resendError } = await resend.emails.send({
+      from: "no-replay@hypepay.com.br",
+      to: [pixChargeMoviment.payerEmail],
+      subject: `Pagamento Realizado | Cobrança PIX - ${pixChargeMoviment.companies.name}`,
+      react: EmailTemplatePayCharge({
+        charge: {
+          ...pixChargeMoviment,
+          payer_document: maskDocument(pixChargeMoviment.payerDocument),
+          companies: {
+            name: pixChargeMoviment.companies.name,
+            document: pixChargeMoviment.companies.document,
+          }
+        }
+      })
+    })
+
+    if (resendError) {
+      console.error("Error sending email:", resendError.message)
     }
 
   } catch (error) {

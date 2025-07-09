@@ -16,7 +16,7 @@ export function CustomCardPayment({ charge, children }: { charge: IChargeDetails
         </div>
         <CardDescription >
           <p className="text-2xl font-bold mb-1 text-pink-600 text-center">Detalhes do Pagamento</p>
-          <p className="text-sm font-semibold text-gray-600 text-center">Pagamento realizado para</p>
+          <p className="text-sm font-semibold text-gray-600 text-center">Empresa recebedora</p>
           <p className="text-sm font-semibold text-gray-600 text-center"><strong>{charge.companies?.name}</strong></p>
         </CardDescription>
       </CardHeader>

@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       })
       .eq("id", charge.id)
 
-    const { data: resendData, error: resendError } = await resend.emails.send({
+    const { error: resendError } = await resend.emails.send({
       from: "no-replay@hypepay.com.br",
       to: [data.payerEmail],
       subject: `Cobrança PIX - ${company.name}`,
