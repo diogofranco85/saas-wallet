@@ -40,7 +40,6 @@ export default function NewCharge() {
 
   const onSubmit = async (postData: IPostData) => {
     setLoading(true)
-
     try {
 
       if (postData.amount < 4.99) {
@@ -56,13 +55,17 @@ export default function NewCharge() {
         }),
       })
 
+      const data = await response.json()
+
       if (response.ok) {
-        const data = await response.json()
         toast("Cobrança criada com sucesso!")
         router.push(`/dashboard/charges/${data.charge.id}`)
       }
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erro desconhecido. Se persistir, contate o suporte.")
+      }
     } catch (error: any) {
-      console.error(error);
       toast.error("Erro ao criar cobrança PIX", { description: error.message })
     } finally {
       setLoading(false)

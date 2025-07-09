@@ -1,3 +1,4 @@
+import { HttpException } from "@/helpers/http-exceptions"
 import { ICreateAccountRequest, ICreateAccountResponse, ICreateBillingRequest, ICreateBillingResponse, ICreatePartner } from "@/types/openpix.interface"
 import axios from "axios"
 const baseURL = process.env.WOOVI_URL
@@ -31,11 +32,20 @@ export const createBilling = async (params: ICreateBillingRequest): Promise<ICre
       return data
     }
 
-    throw new Error("Response is void")
+    throw new HttpException(400, "Response is void")
+
   } catch (error: any) {
-    throw new Error(error.response?.data?.error || error.message)
+    if (error instanceof HttpException) {
+      throw error;
+    }
+
+    throw new HttpException(error.status || 503, error.response?.data || error.message)
   }
 }
+
+
+
+
 
 export const createPartner = async (params: ICreatePartner) => {
 

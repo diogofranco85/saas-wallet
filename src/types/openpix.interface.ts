@@ -14,21 +14,21 @@ export interface ICreateAccountResponse {
 export interface ICreateBillingRequest {
   correlationID: string;
   value: number
-  comment?: string
-  costumer?: {
+  comment: string
+  costumer: {
     name: string;
     taxID: TaxTypeEnum;
     email?: string;
     phone?: string;
   },
-  additionalInfo?: Record<string, string>[],
+  additionalInfo: Record<string, string>[],
   subaccount?: string
-  splits?: {
+  splits: {
     value: number
     pixKey: string,
     splitType: "SPLIT_SUB_ACCOUNT" | "SPLIT_INTERNAL_TRANSFER" | "SPLIT_PARTNER"
   }[]
-  expiresIn?: number // Em segundos, padrão 60 * 15 (15 minutos)
+  expiresIn: number // Em segundos, padrão 60 * 15 (15 minutos)
 }
 
 export interface ICreateBillingResponse {

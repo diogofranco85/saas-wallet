@@ -7,6 +7,8 @@ import { formatDocument } from "@/helpers/formatDocument"
 import { resend } from "@/lib/resend"
 import { EmailTemplateCreateCharge } from "@/components/email/charge/create"
 import { maskDocument } from "@/helpers/maskDocument"
+import { HttpException } from "@/helpers/http-exceptions"
+import { ICreateBillingRequest } from "@/types/openpix.interface"
 
 export async function POST(request: NextRequest) {
   let chargeId;
@@ -95,7 +97,8 @@ export async function POST(request: NextRequest) {
     const splitValue = grossAmount - feeAmount - feeFixed;
 
     chargeId = charge.id;
-    const paymentIntent = await createBilling({
+
+    const createBillingPayload: ICreateBillingRequest = {
       correlationID: charge.id,
       value: grossAmount,
       comment: data.description,
@@ -114,10 +117,11 @@ export async function POST(request: NextRequest) {
         }
       ],
       costumer: {
-        email: data.payer_email || "",
-        name: data.payer_name,
-        taxID: data.payer_document
+        email: data.payerEmail || "",
+        name: data.payerName,
+        taxID: data.payerDocument
       },
+      //subaccount: company.pix_key,
       splits: [
         {
           value: splitValue,
@@ -126,7 +130,9 @@ export async function POST(request: NextRequest) {
         }
       ],
       expiresIn: 60 * 15, // Expira em 15 minutos
-    })
+    }
+
+    const paymentIntent = await createBilling(createBillingPayload)
 
     await supabase.from("pix_charges")
       .update({
@@ -158,10 +164,7 @@ export async function POST(request: NextRequest) {
 
     if (resendError) {
       console.error("Error sending email:", resendError.message)
-      // Não falhar a criação da cobrança se o envio de e-mail falhar
     }
-
-    console.log("Email sent successfully:", resendData)
 
     return NextResponse.json({
       success: true,
@@ -174,12 +177,18 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error("Error creating charge:", error)
     await supabase.from("pix_charges")
       .update({
         status: "cancelled",
       })
       .eq("id", chargeId)
+
+    if (error instanceof HttpException) {
+      return new Response(JSON.stringify(error.message), {
+        status: error.status,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     return NextResponse.json(
       {
