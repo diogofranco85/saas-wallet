@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         {
           message: "Event not handled",
         },
-        { status: 429 },
+        { status: 200 },
       )
     }
 
