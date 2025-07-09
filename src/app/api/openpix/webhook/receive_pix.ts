@@ -110,6 +110,7 @@ export async function receivedPixWebhook(body: any, header: string) {
       react: EmailTemplatePayCharge({
         charge: {
           ...pixChargeMoviment,
+          endtoend: body.pix.endToEndId,
           payer_document: maskDocument(pixChargeMoviment.payer_document),
           companies: {
             name: pixChargeMoviment.companies.name,

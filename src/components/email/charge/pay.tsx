@@ -16,20 +16,20 @@ export function EmailTemplatePayCharge({ charge }: { charge: IChargeDetails }) {
             <div className="w-full max-w-md">
               <CustomCardPayment charge={charge}>
                 <>
-                  <Alert className="bg-green-100 text-green-800 mt-3  flex items-center">
+                  <div className="bg-green-100 text-green-800 mt-3  flex items-center">
                     <div className="w-1/6 flex items-center justify-center">
                       <CheckCircle2Icon />
                     </div>
-                    <div className="py-4">
-                      <AlertTitle className="text-xl">Pagamento realizado</AlertTitle>
-                      <AlertDescription className="text-sm my-3">
+                    <div className="py-4 text-green-700">
+                      <div className="text-xl">Pagamento realizado</div>
+                      <div className="text-sm my-3 ">
                         O pagamento foi realizado e processado com sucesso.
-                      </AlertDescription>
+                      </div>
                       {charge.paid_at && (
                         <p><strong>Pago em:</strong> {formatDate(charge.paid_at)}</p>
                       )}
                     </div>
-                  </Alert>
+                  </div>
                   <div className="text-sm m-2 text-center">
                     <p><strong>Confirmação de pagamento</strong></p>
                     <p>{charge.endtoend}</p>
