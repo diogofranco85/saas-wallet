@@ -4,12 +4,6 @@ import { HttpException } from "@/helpers/http-exceptions";
 
 export async function POST(request: NextRequest) {
   try {
-    // Simulate processing the webhook
-    return NextResponse.json(
-      {
-        message: "Event not handled",
-      },
-      { status: 200 })
 
     const body = await request.json()
     const header = request.headers.get("X-OpenPix-Signature");
