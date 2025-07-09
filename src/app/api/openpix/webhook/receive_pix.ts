@@ -38,7 +38,7 @@ export async function receivedPixWebhook(body: any, header: string) {
       throw pixChargeError
     }
 
-    if (pixChargeMoviment.status !== "paid") {
+    if (pixChargeMoviment.status == "paid") {
       throw new HttpException(200, `Transaction status current is paid`)
     }
 
@@ -105,7 +105,7 @@ export async function receivedPixWebhook(body: any, header: string) {
 
     const { error: resendError } = await resend.emails.send({
       from: process.env.RESEND_EMAIL_FROM as string,
-      to: [pixChargeMoviment.payerEmail],
+      to: [pixChargeMoviment.payer_email],
       subject: `Pagamento Realizado | Cobrança PIX - ${pixChargeMoviment.companies.name}`,
       react: EmailTemplatePayCharge({
         charge: {
