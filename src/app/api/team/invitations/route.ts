@@ -3,6 +3,9 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { createServerClient } from "@/lib/supabase"
 import { randomBytes } from "crypto"
+import { EmailTemplateInvite } from "@/components/email/invitations/invite"
+import { resend } from "@/lib/resend"
+import { formatDate } from "@/helpers/formatDate"
 
 export async function GET() {
   try {
@@ -68,7 +71,7 @@ export async function POST(request: NextRequest) {
     // Buscar usuário e empresa
     const { data: user } = await supabase
       .from("users")
-      .select("id, company_id, role")
+      .select("id, name, company_id, role, companies(id, name)")
       .eq("email", session.user.email)
       .single()
 
@@ -110,6 +113,7 @@ export async function POST(request: NextRequest) {
     const token = randomBytes(32).toString("hex")
 
     // Criar convite
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
     const { data: invitation, error } = await supabase
       .from("invitations")
       .insert({
@@ -119,7 +123,7 @@ export async function POST(request: NextRequest) {
         role,
         token,
         status: "pending",
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias
+        expires_at: expiresAt, // 7 dias
       })
       .select(`
         *,
@@ -144,6 +148,28 @@ export async function POST(request: NextRequest) {
       p_description: `Convite enviado para ${email}`,
       p_metadata: { email, role },
     })
+
+    const companies = user?.companies
+
+    const company = Array.isArray(companies) ? companies[0] : companies
+
+    const { error: resendError } = await resend.emails.send({
+      from: process.env.RESEND_EMAIL_FROM as string,
+      to: [invitation.email],
+      subject: `Hype Pay | Convite de Acesso - ${company.name}`,
+      react: EmailTemplateInvite({
+        invite: {
+          link: `${process.env.SITE_URL}/invite/${invitation.token}`,
+          senderName: user.name,
+          expiresAt: formatDate(expiresAt)
+        },
+        companies: company
+      })
+    })
+
+    if (resendError) {
+      console.error("Error sending email:", resendError.message)
+    }
 
     return NextResponse.json({ success: true, invitation: formattedInvitation })
   } catch (error) {

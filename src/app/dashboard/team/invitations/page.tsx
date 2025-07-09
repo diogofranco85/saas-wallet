@@ -141,7 +141,7 @@ export default function TeamInvitationsPage() {
         const data = await response.json()
         const inviteUrl = `${window.location.origin}/invite/${data.invitation.token}`
         navigator.clipboard.writeText(inviteUrl)
-        toast.success("Reenviar convite", { description: `Convite reenviado! Link copiado para a área de transferência:\n\n${inviteUrl}` })
+        toast.success("Reenviar convite", { description: `Convite reenviado para o email do convidado` })
       }
     } catch (error: any) {
       toast.error("Error ao reenviar convite:", { description: error.message })
