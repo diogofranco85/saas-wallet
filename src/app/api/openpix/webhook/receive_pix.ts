@@ -28,13 +28,6 @@ export async function receivedPixWebhook(body: any, header: string) {
     //   throw new HttpException(403, "Invalid signature webhook");
     // }
 
-    await supabase.from("pix_charges").update({
-      paid_at: body.charge.paidAt,
-      transaction_id: body.charge.transactionID,
-      endtoend: body.pix.endToEndId,
-      status: statusParser(body.charge.status),
-    }).eq("id", body.charge.correlationID);
-
     const { data: pixChargeMoviment, error: pixChargeError } = await supabase
       .from("pix_charges")
       .select("*, companies(*)")
@@ -44,6 +37,23 @@ export async function receivedPixWebhook(body: any, header: string) {
     if (pixChargeError) {
       throw pixChargeError
     }
+
+    if (pixChargeMoviment.status !== "paid") {
+      throw new HttpException(200, `Transaction status current is paid`)
+    }
+
+    if (pixChargeMoviment.status !== "pending") {
+      throw new HttpException(400, `Transaction not paid, status current: ${pixChargeMoviment.status}`)
+    }
+
+    await supabase.from("pix_charges").update({
+      paid_at: body.charge.paidAt,
+      transaction_id: body.charge.transactionID,
+      endtoend: body.pix.endToEndId,
+      status: statusParser(body.charge.status),
+    }).eq("id", body.charge.correlationID);
+
+
 
     await supabase
       .from("wallets")
