@@ -35,6 +35,7 @@ export const createBilling = async (params: ICreateBillingRequest): Promise<ICre
     throw new HttpException(400, "Response is void")
 
   } catch (error: any) {
+    console.error("open pix :: create billing", error)
     if (error instanceof HttpException) {
       throw error;
     }

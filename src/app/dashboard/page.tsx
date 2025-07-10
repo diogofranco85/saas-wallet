@@ -69,7 +69,7 @@ export default function Dashboard() {
     try {
       const [walletResponse, chargesResponse] = await Promise.all([
         fetch("/api/wallet"),
-        fetch("/api/charges?limit=5")
+        fetch("/api/charges?limit=5"),
       ])
 
       const walletData = await walletResponse.json()

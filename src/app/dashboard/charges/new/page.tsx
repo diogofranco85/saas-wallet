@@ -1,7 +1,9 @@
 "use client"
 
 import { CustomContainer } from "@/components/custom-container"
+import { CustomLoading } from "@/components/loading"
 import { PageHeader } from "@/components/page-header"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -11,7 +13,7 @@ import { formatDocument } from "@/helpers/formatDocument"
 import { ArrowLeft, BadgeXIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
@@ -27,6 +29,9 @@ interface IPostData {
 export default function NewCharge() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [loadingMessage, setLoadingMessage] = useState("")
+  const [blockMessage, setBlockMessage] = useState("")
+  const [isAllowCreateCharge, setIsAllowCreateCharge] = useState(true)
   const { control, handleSubmit, setValue } = useForm<IPostData>({
     defaultValues: {
       amount: 0,
@@ -38,7 +43,39 @@ export default function NewCharge() {
     }
   })
 
+
+  useEffect(() => {
+    validateCreateCharge()
+  }, [])
+
+  const validateCreateCharge = async () => {
+    try {
+      setLoadingMessage("Validando seus dados...  por favor aguarde")
+      setLoading(true)
+      const response = await fetch("/api/charges/validate", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setIsAllowCreateCharge(true)
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erro desconhecido. Se persistir, contate o suporte.")
+      }
+    } catch (error: any) {
+      setIsAllowCreateCharge(false)
+      setBlockMessage(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const onSubmit = async (postData: IPostData) => {
+    setLoadingMessage("Criando uma nova conbrança...  por favor aguarde")
     setLoading(true)
     try {
 
@@ -86,6 +123,10 @@ export default function NewCharge() {
     return Number(onlyNumbers) / 100
   }
 
+  if (loading) {
+    return <CustomLoading text={loadingMessage} />
+  }
+
   return (
     <CustomContainer>
       <PageHeader
@@ -115,7 +156,7 @@ export default function NewCharge() {
       />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          <Card className="border-pink-700">
+          {isAllowCreateCharge && <Card className="border-pink-700">
             <CardHeader>
               <CardTitle>Cobrança PIX</CardTitle>
               <CardDescription>Preencha os dados para gerar uma nova cobrança PIX</CardDescription>
@@ -236,7 +277,14 @@ export default function NewCharge() {
                 </div>
               </form>
             </CardContent>
-          </Card>
+          </Card>}
+
+          {!isAllowCreateCharge && <Alert className="border-yellow-200">
+            <AlertTitle>Não é possivel criar cobranças no momento</AlertTitle>
+            <AlertDescription>
+              {blockMessage}
+            </AlertDescription>
+          </Alert>}
         </div>
       </div>
     </CustomContainer>

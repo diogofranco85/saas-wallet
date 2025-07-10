@@ -27,7 +27,7 @@ export default function SignIn() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-pink-800">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="w-full flex max-w-md border-pink-800 flex-col gap-6 py-6">
         <CardHeader className="text-center">
           <div className="flex justify-center my-4">
@@ -40,19 +40,19 @@ export default function SignIn() {
           <CardDescription className=" text-slate-300">Entre com sua conta Google para acessar o dashboard ou se cadastrar</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={handleGoogleSignIn} className="w-full bg-gray-900 hover:bg-gray-800" size="lg">
+          <Button onClick={handleGoogleSignIn} className="w-full bg-white hover:bg-slate-100 text-gray-600" size="lg">
             <Chrome className="mr-2 h-5 w-5" />
             Entrar com Google
           </Button>
           <Link href="/">
-            <Button className="w-full bg-slate-100 hover:bg-slate-300 text-gray-800 mt-5" size="lg">
+            <Button className="w-full bg-pink-600 hover:bg-pink-700 text-white mt-5" size="lg">
               <ArrowLeftIcon className="mr-2 h-5 w-5" />
               Voltar pra home
             </Button>
           </Link>
         </CardContent>
         <CardFooter className="text-center text-sm">
-          <p className="text-slate-300">Leia nossos <Link href="/terms-of-use" className="text-slate-900"> termos e condições de uso </Link> da plataforma</p>
+          <p className="text-slate-300">Leia nossos <Link href="/terms-of-use" className="text-pink-400"> termos e condições de uso </Link> da plataforma</p>
         </CardFooter>
       </div>
     </div>

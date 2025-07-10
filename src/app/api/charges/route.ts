@@ -43,14 +43,39 @@ export async function POST(request: NextRequest) {
         *,
         plans (
           pix_fee_percentage,
-          pix_fee_fixed
+          pix_fee_fixed,
+          max_employees
         )
       `)
       .eq("id", user.company_id)
       .single()
 
     if (!company) {
-      return NextResponse.json({ message: "Empresão não foi localizadad" }, { status: 404 })
+      return NextResponse.json({ message: "Empresão não foi localizada" }, { status: 404 })
+    }
+
+    const plansExpired = new Date(company.access_date) < new Date()
+    if (plansExpired) {
+      throw new HttpException(400, "Seu plano expirou, para poder fazer nova cobrança e necessario contratar novamente")
+    }
+
+    const startPlanDate = new Date(company.access_date)
+    startPlanDate.setDate(startPlanDate.getDate() - 30);
+
+    const { error: pixChargesCountError, count: pixChargesCount } = await supabase
+      .from("pix_charges")
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", company.id)
+      .eq("status", "paid")
+      .gte('created_at', startPlanDate.toISOString())
+      .lt('created_at', company.access_date);
+
+    if (pixChargesCountError) {
+      throw new HttpException(400, { error: "Houve um error ao validar a quantidade de cobranças recebidas" })
+    }
+
+    if ((pixChargesCount || 0) >= company.plans.max_employees) {
+      throw new HttpException(400, { error: "Voce já atingiu o número máximo de cobranças no mês do seu plano" })
     }
 
     // Verificar se a empresa tem conta Stripe ativa
